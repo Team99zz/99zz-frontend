@@ -1,41 +1,35 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../utils/supabaseClient";
-// Grommet should only be included once
-import { grommet, Grommet } from "grommet";
-
-import Auth from "../components/Auth";
-import Account from "../components/Account";
-// Theme for grommet
-const theme = {
-  global: {
-    font: {
-      family: 'Roboto',
-      size: '14px',
-      height: '20px',
-    },
-  },
-};
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { supabase } from '../api'
 
 export default function Home() {
-  const [session, setSession] = useState(null);
-
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
-    setSession(supabase.auth.session());
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
+    fetchPosts()
+  }, [])
+  async function fetchPosts() {
+    const { data, error } = await supabase
+      .from('posts')
+      .select()
+    setPosts(data)
+    setLoading(false)
+  }
+  if (loading) return <p className="text-2xl">Loading ...</p>
+  if (!posts.length) return <p className="text-2xl">No posts.</p>
   return (
-    <Grommet theme={theme}>
-      <div className="container" style={{ padding: "50px 0 100px 0" }}>
-        {!session ? (
-          <Auth />
-        ) : (
-          <Account key={session.user.id} session={session} />
-        )}
-      </div>
-    </Grommet>
-  );
+    <div>
+      <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">Posts</h1>
+      {
+        posts.map(post => (
+          <Link key={post.id} href={`/posts/${post.id}`}>
+            <div className="cursor-pointer border-b border-gray-300	mt-8 pb-4">
+              <h2 className="text-xl font-semibold">{post.title}</h2>
+              <p className="text-gray-500 mt-2">Author: {post.user_email}</p>
+            </div>
+          </Link>)
+        )
+      }
+    </div>
+  )
 }
