@@ -6,7 +6,7 @@ import Avatar from "./Avatar";
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
-  const [website, setWebsite] = useState(null);
+  const [title, setTitle] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
 
   useEffect(() => {
@@ -17,11 +17,13 @@ export default function Account({ session }) {
     try {
       setLoading(true);
       const user = supabase.auth.user();
-
+      // Sending user UUID
+      console.log(user.id)
+      
       let { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, website, avatar_url`)
-        .eq("id", user.id)
+        .from("user")
+        .select(`username, title, avatar_url`)
+        .eq("uid", user.id)
         .single();
 
       if (error && status !== 406) {
@@ -30,7 +32,7 @@ export default function Account({ session }) {
 
       if (data) {
         setUsername(data.username);
-        setWebsite(data.website);
+        setTitle(data.title);
         setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
@@ -40,20 +42,19 @@ export default function Account({ session }) {
     }
   }
 
-  async function updateProfile({ username, website, avatar_url }) {
+  async function updateProfile({ username, title, avatar_url }) {
     try {
       setLoading(true);
       const user = supabase.auth.user();
 
       const updates = {
-        id: user.id,
+        uid: user.id,
         username,
-        website,
-        avatar_url,
-        updated_at: new Date(),
+        title,
+        avatar_url
       };
 
-      let { error } = await supabase.from("profiles").upsert(updates, {
+      let { error } = await supabase.from("user").upsert(updates, {
         returning: "minimal", // Don't return the value after inserting
       });
 
@@ -74,7 +75,7 @@ export default function Account({ session }) {
         size={150}
         onUpload={(url) => {
           setAvatarUrl(url);
-          updateProfile({ username, website, avatar_url: url });
+          updateProfile({ username, title, avatar_url: url });
         }}
       />
       <div>
@@ -91,19 +92,19 @@ export default function Account({ session }) {
         />
       </div>
       <div>
-        <label htmlFor="website">Website</label>
+        <label htmlFor="title">Title</label>
         <input
-          id="website"
-          type="website"
-          value={website || ""}
-          onChange={(e) => setWebsite(e.target.value)}
+          id="title"
+          type="text"
+          value={title || ""}
+          onChange={(e) => setTitle(e.target.value)}
         />
       </div>
 
       <div>
         <button
           className="button block primary"
-          onClick={() => updateProfile({ username, website, avatar_url })}
+          onClick={() => updateProfile({ username, title, avatar_url })}
           disabled={loading}
         >
           {loading ? "Loading ..." : "Update"}

@@ -5,7 +5,7 @@ import { grommet, Grommet } from "grommet";
 
 import Auth from "../components/Auth";
 import Account from "../components/Account";
-// Theme for grommet
+// Theme for gromme
 const theme = {
   global: {
     font: {
