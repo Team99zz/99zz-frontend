@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
+import Link from 'next/link'
+
 import styled from "styled-components";
 import CustomAvatar from "./Avatar";
 
@@ -246,11 +248,16 @@ export default function Account({ session }) {
         </StartButton>
       </div>
 
+      <Link href="/feed">
+          <a>Feed</a>
+        </Link>
+
       <div>
         <SignOutButton onClick={() => supabase.auth.signOut()}>
           다른 계정으로 시작하기
         </SignOutButton>
       </div>
+
     </AccountDiv>
   );
 }
