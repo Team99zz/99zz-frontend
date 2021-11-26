@@ -5,15 +5,16 @@ import CustomAvatar from "./Avatar";
 
 import { Button } from "antd";
 import { Input } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 
 const BlogH1 = styled.h1`
   font-size: 24px;
   font-weight: 700;
-`
+`;
 const AccountDiv = styled.div`
   background-color: #f5f5f5;
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,7 +30,7 @@ const EmailInput = styled.div`
   border-bottom: 1px solid black;
   padding-left: 11px;
   color: grey;
-`
+`;
 
 const UserCard = styled.div`
   background-color: #fff;
@@ -58,14 +59,28 @@ const CustomInput = styled(Input)`
   border-right: none;
   width: 250px;
   border-color: black;
-  padding-top: 10px;
+  padding-top: 15px;
   border-radius: 0px;
 `;
 
-const TagDiv = styled.div`
-  text-align: center;
-  padding-top: 20px;
+const SearchInput = styled.input`
   width: 300px;
+  height: 50px;
+  border-radius: 15px;
+  border: none;
+  text-align: center;
+`;
+
+const TagContainer = styled.div`
+  text-align: center;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  width: 300px;
+`;
+
+const TagDiv = styled.div`
+  padding-top: 20px;
+  padding-bottom: 20px;
 `;
 
 const TagTitle = styled.p`
@@ -78,19 +93,27 @@ const TagDesc = styled.p`
   font-size: 14px;
 `;
 
-const { Search } = Input;
-
-const CustomSearch = styled(Search)`
-  border-radius: 15px !important;
-`
+const CustomTag = styled.div`
+  font-size: 17px;
+  padding: 10px 15px;
+  vertical-align: middle;
+  border: 1px solid black;
+  border-radius: 25px;
+  & div {
+    float: right;
+    display: inline;
+  }
+`;
 
 const SignOutButton = styled(Button)`
   background: none;
   border: none;
   box-shadow: none;
-  
-`
+`;
 
+const closeTag = () => {
+  console.log("Close Tag");
+};
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true);
@@ -172,9 +195,7 @@ export default function Account({ session }) {
           }}
         />
         <div>
-          <EmailInput>
-            {session.user.email}
-          </EmailInput>
+          <EmailInput>{session.user.email}</EmailInput>
         </div>
         <div>
           <CustomInput
@@ -196,20 +217,26 @@ export default function Account({ session }) {
         </div>
       </UserCard>
 
-      <TagDiv>
+      <TagContainer>
         <TagTitle>당신은 어떤 사람입니까?</TagTitle>
         <TagDesc>
           당신을 표현하는 단어를 자유롭게 입력해주세요.
           <br />
           클릭해서 수정할 수 있습니다
         </TagDesc>
-        <CustomSearch
-          placeholder="input search text"
-          allowClear
-          enterButton="추가하기"
-          size="large"
-        />
-      </TagDiv>
+        <SearchInput placeholder="아무거나 입력하기" />
+        <TagDiv>
+          <CustomTag closable>
+            Tag 2
+            <div>
+              <CloseOutlined onClick={closeTag} />
+            </div>
+          </CustomTag>
+         
+
+        </TagDiv>
+      </TagContainer>
+
       <div>
         <StartButton
           onClick={() => updateProfile({ username, title, avatar_url })}
@@ -220,9 +247,7 @@ export default function Account({ session }) {
       </div>
 
       <div>
-        <SignOutButton
-          onClick={() => supabase.auth.signOut()}
-        >
+        <SignOutButton onClick={() => supabase.auth.signOut()}>
           다른 계정으로 시작하기
         </SignOutButton>
       </div>

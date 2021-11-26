@@ -11,6 +11,7 @@ const AvatarDiv = styled.div`
   align-items: center;
   flex-direction: column;
   justify-content: center;
+  text-align: center;
 `;
 
 export default function CustomAvatar({ url, size, onUpload }) {
@@ -71,20 +72,18 @@ export default function CustomAvatar({ url, size, onUpload }) {
         <Avatar
           src={avatarUrl}
           alt="Avatar"
-          className="avatar image"
           style={{ height: size, width: size }}
         />
       ) : (
         <Avatar size={100} icon={<UserOutlined />} />
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
+      <div>
+        <label htmlFor="single">
           {uploading ? "Uploading ..." : "Upload"}
         </label>
         <input
           style={{
             visibility: "hidden",
-            position: "absolute",
           }}
           type="file"
           id="single"
