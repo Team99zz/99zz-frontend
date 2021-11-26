@@ -1,20 +1,10 @@
+import Head from "next/head";
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
-// Grommet should only be included once
-import { grommet, Grommet } from "grommet";
+
 
 import Auth from "../components/Auth";
 import Account from "../components/Account";
-// Theme for gromme
-const theme = {
-  global: {
-    font: {
-      family: 'Roboto',
-      size: '14px',
-      height: '20px',
-    },
-  },
-};
 
 export default function Home() {
   const [session, setSession] = useState(null);
@@ -28,14 +18,19 @@ export default function Home() {
   }, []);
 
   return (
-    <Grommet theme={theme}>
-      <div className="container" style={{ padding: "50px 0 100px 0" }}>
+    <div>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+
+      <div>
         {!session ? (
           <Auth />
         ) : (
+            // Needs to be changed to main screen
           <Account key={session.user.id} session={session} />
         )}
       </div>
-    </Grommet>
+    </div>
   );
 }

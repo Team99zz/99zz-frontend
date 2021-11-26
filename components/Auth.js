@@ -1,6 +1,54 @@
 import { useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 
+import { Button } from "antd";
+
+import styled from "styled-components";
+import { GoogleOutlined } from "@ant-design/icons";
+
+const AuthDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #244fdf;
+`;
+
+const TitleDiv = styled.div`
+  text-align: center;
+  padding-bottom: 80px;
+`;
+
+const TitleDesc = styled.p`
+  font-size: 18px;
+  line-height: 20px;
+  color: #fff;
+  font-weight: 600;
+  padding-bottom: 10px;
+`;
+
+const Title = styled.p`
+  font-size: 5rem;
+  color: #fff;
+  font-family: "Neometric", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 20px;
+`;
+
+const ButtonSpan = styled.span`
+  padding-left: 20px;
+  padding-right: 20px;
+`
+
+const Copyright = styled.p`
+  font-size: 10px;
+  color: #fff;
+  position: absolute;
+  bottom: 0;
+`
+
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -26,7 +74,7 @@ export default function Auth() {
       });
       if (error) throw error;
       console.log(error);
-    //   alert("Google login not working")
+      //   alert("Google login not working")
     } catch (error) {
       alert(error.error_description || error.message);
     } finally {
@@ -35,46 +83,28 @@ export default function Auth() {
   }
 
   return (
-    <div className="row flex flex-center">
-      <div className="col-6 form-widget">
-        <h1 className="header">Supabase + Next.js</h1>
-        <p className="description">
-          Sign in via magic link with your email below
-        </p>
-        <div>
-          <input
-            className="inputField"
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogin(email);
-            }}
-            className="button block"
-            disabled={loading}
-          >
-            <span>{loading ? "Loading" : "Send magic link"}</span>
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              googleLogin(email);
-            }}
-            className="button block"
-            disabled={loading}
-          >
-            <span>{loading ? "Loading" : "Google Login"}</span>
-          </button>
-        </div>
+    <AuthDiv>
+      <TitleDiv>
+        <TitleDesc>당신의 일상을</TitleDesc>
+        <Title>99ZZ</Title>
+      </TitleDiv>
+
+      <div>
+        <Button
+          block
+          shape="round"
+          size="large"
+          onClick={(e) => {
+            e.preventDefault();
+            googleLogin(email);
+          }}
+          disabled={loading}
+        >
+          <GoogleOutlined style={{fontSize: '19px'}} />
+          <ButtonSpan>{loading ? "Loading" : "Google로 시작하기"}</ButtonSpan>
+        </Button>
       </div>
-    </div>
+      <Copyright>Team 99zz 2021 (c) All Right Reserved</Copyright>
+    </AuthDiv>
   );
 }

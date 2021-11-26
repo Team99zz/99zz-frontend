@@ -1,10 +1,100 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
+import styled from "styled-components";
+import CustomAvatar from "./Avatar";
 
-import Avatar from "./Avatar";
+import { Button } from "antd";
+import { Input } from "antd";
+
+const BlogH1 = styled.h1`
+  font-size: 24px;
+  font-weight: 700;
+`
+const AccountDiv = styled.div`
+  background-color: #f5f5f5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0px;
+`;
+
+const EmailInput = styled.div`
+  width: 250px;
+  border-color: black;
+  padding-top: 10px;
+  border-radius: 0px;
+  border-bottom: 1px solid black;
+  padding-left: 11px;
+  color: grey;
+`
+
+const UserCard = styled.div`
+  background-color: #fff;
+  width: 300px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  padding: 20px;
+`;
+
+const StartButton = styled(Button)`
+  background-color: #244fdf;
+  width: 300px;
+  height: 50px;
+  border-radius: 15px;
+  color: #fff;
+  font-size: 20px;
+`;
+
+const CustomInput = styled(Input)`
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  width: 250px;
+  border-color: black;
+  padding-top: 10px;
+  border-radius: 0px;
+`;
+
+const TagDiv = styled.div`
+  text-align: center;
+  padding-top: 20px;
+  width: 300px;
+`;
+
+const TagTitle = styled.p`
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 5px;
+`;
+
+const TagDesc = styled.p`
+  font-size: 14px;
+`;
+
+const { Search } = Input;
+
+const CustomSearch = styled(Search)`
+  border-radius: 15px !important;
+`
+
+const SignOutButton = styled(Button)`
+  background: none;
+  border: none;
+  box-shadow: none;
+  
+`
+
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true);
+  const [id, setId] = useState(null);
   const [username, setUsername] = useState(null);
   const [title, setTitle] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
@@ -18,12 +108,12 @@ export default function Account({ session }) {
       setLoading(true);
       const user = supabase.auth.user();
       // Sending user UUID
-      console.log(user.id)
-      
+      console.log(user.id);
+
       let { data, error, status } = await supabase
         .from("user")
-        .select(`username, title, avatar_url`)
-        .eq("uid", user.id)
+        .select(`username, title, avatar_url, id`)
+        .eq("id", user.id)
         .single();
 
       if (error && status !== 406) {
@@ -34,6 +124,7 @@ export default function Account({ session }) {
         setUsername(data.username);
         setTitle(data.title);
         setAvatarUrl(data.avatar_url);
+        setId(data.id);
       }
     } catch (error) {
       alert(error.message);
@@ -48,10 +139,10 @@ export default function Account({ session }) {
       const user = supabase.auth.user();
 
       const updates = {
-        uid: user.id,
+        id,
         username,
         title,
-        avatar_url
+        avatar_url,
       };
 
       let { error } = await supabase.from("user").upsert(updates, {
@@ -69,56 +160,72 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="form-widget">
-      <Avatar
-        url={avatar_url}
-        size={150}
-        onUpload={(url) => {
-          setAvatarUrl(url);
-          updateProfile({ username, title, avatar_url: url });
-        }}
-      />
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="username">Name</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
+    <AccountDiv>
+      <BlogH1>블로그 정보</BlogH1>
+      <UserCard>
+        <CustomAvatar
+          url={avatar_url}
+          size={150}
+          onUpload={(url) => {
+            setAvatarUrl(url);
+            updateProfile({ username, title, avatar_url: url });
+          }}
         />
-      </div>
-      <div>
-        <label htmlFor="title">Title</label>
-        <input
-          id="title"
-          type="text"
-          value={title || ""}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
+        <div>
+          <EmailInput>
+            {session.user.email}
+          </EmailInput>
+        </div>
+        <div>
+          <CustomInput
+            placeholder="닉네임"
+            id="username"
+            type="text"
+            value={username || ""}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div>
+          <CustomInput
+            placeholder="블로그 이름"
+            id="title"
+            type="text"
+            value={title || ""}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+      </UserCard>
 
+      <TagDiv>
+        <TagTitle>당신은 어떤 사람입니까?</TagTitle>
+        <TagDesc>
+          당신을 표현하는 단어를 자유롭게 입력해주세요.
+          <br />
+          클릭해서 수정할 수 있습니다
+        </TagDesc>
+        <CustomSearch
+          placeholder="input search text"
+          allowClear
+          enterButton="추가하기"
+          size="large"
+        />
+      </TagDiv>
       <div>
-        <button
-          className="button block primary"
+        <StartButton
           onClick={() => updateProfile({ username, title, avatar_url })}
           disabled={loading}
         >
-          {loading ? "Loading ..." : "Update"}
-        </button>
+          {loading ? "Loading ..." : "시작하기"}
+        </StartButton>
       </div>
 
       <div>
-        <button
-          className="button block"
+        <SignOutButton
           onClick={() => supabase.auth.signOut()}
         >
-          Sign Out
-        </button>
+          다른 계정으로 시작하기
+        </SignOutButton>
       </div>
-    </div>
+    </AccountDiv>
   );
 }
