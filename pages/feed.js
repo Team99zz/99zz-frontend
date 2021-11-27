@@ -110,18 +110,7 @@ export default function Feed({ session }) {
                 .select('title, avatar_url')
                 .eq("id", p.user)
                 .single();
-            return {...p, ...data}
-          })
-      )
-
-      posting = await Promise.all(
-          posting.map( async p => {
-            let {data, error } = await supabase
-                .from('user')
-                .select('title, avatar_url')
-                .eq("id", p.user)
-                .single();
-            return {...p, ...data}
+            return {...p, ...{blog_title:data.title, avatar_url: data.avatar_url}}
           })
       )
 
