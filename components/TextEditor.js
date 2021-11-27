@@ -22,6 +22,7 @@ const SubmitButton = styled(Button)`
   border-radius: 15px;
   color: #fff;
   font-size: 20px;
+  margin-top : 20px;
 `;
 const Title = styled.div`
     
@@ -53,6 +54,7 @@ const EditorComponent = styled.div`
     }
 
     .DraftEditor-root {
+        background-color : white;
         border: 1px solid #eee;
         margin: 0.5rem 0;
         border-radius: 0.5rem;
@@ -99,17 +101,31 @@ const EditorComponent = styled.div`
 
 `;
 const ToolbarComponent = styled.div`
-    
+    h3{
+        display :inline;
+        font-weight : bold;
+    }
     .hidden{
         display : none;
     }
     button {
         border: none;
-        background-color: white;
-        padding: 0.5rem 1rem;
+        background-color: #f5f5f5 ;
+        padding: 1rem;
     }
 `;
+const PostSetting = styled.div`
+    font-weight : bold;
+    text-align : center;
+    padding : 0px 20px;
+    h2 { 
+        font-weight : bold;
+    }
+`;
+
+
 const CustomSlider = styled(Slider)``;
+
 
 const marks = {
     0: "나",
@@ -302,7 +318,7 @@ export default function TextEditor({ uuid }) {
                 />
             </EditorComponent>
             <ToolbarComponent>
-                문단 모양
+                <h3>문단 모양</h3>
                 <button onMouseDown={(event) => handleBlockClick(event, "h")}>
                     <BiFontSize />
                 </button>
@@ -315,7 +331,9 @@ export default function TextEditor({ uuid }) {
                 <button onMouseDown={(event) => handleBlockClick(event, "unordered-list-item")}>
                     <MdFormatListBulleted />
                 </button>
-                글자 모양
+            </ToolbarComponent>
+            <ToolbarComponent>
+                <h3>글자 모양</h3>
                 <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>
                     <MdFormatBold />
                 </button>
@@ -341,8 +359,8 @@ export default function TextEditor({ uuid }) {
                     onChange={(event) => handleInsertImage(event)}
                 />
             </ToolbarComponent>
-
-            <div>
+            
+            <PostSetting>
                 <h2>공개 범위</h2>
                 <CustomSlider
                     defaultValue={33}
@@ -353,21 +371,17 @@ export default function TextEditor({ uuid }) {
                     trackStyle={{ backgroundColor: "#244FDF" }}
                     handleStyle={{ borderColor: "#244FDF" }}
                 />
-
-            </div>
-            <div>
                 <h2>카테고리</h2>
                 <CategorySelect>
                     <Option>
                         Hello World
                     </Option>
                 </CategorySelect>
+            </PostSetting>
 
-            </div>
             <SubmitButton
                 onClick={handleSubmit}>
-
-            글 쓰기
+                글 쓰기
             </SubmitButton>
         </div>
     );
