@@ -3,7 +3,7 @@ import { supabase } from "../utils/supabaseClient";
 
 import Nav from "../components/Nav";
 
-export default function Feed() {
+export default function Search() {
   // const [session, setSession] = useState(null);
 
   // useEffect(() => {
@@ -13,5 +13,5 @@ export default function Feed() {
   //     setSession(session);
   //   });
   // }, []);
-  return <div><Nav name="feed"></Nav></div>;
+  return <div><Nav name="search"></Nav></div>;
 }

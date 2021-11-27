@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 
 import Auth from "../components/Auth";
-import Account from "../components/Account";
+import Setup from "../components/Setup";
 
 export default function Home() {
   const [session, setSession] = useState(null);
@@ -27,7 +27,7 @@ export default function Home() {
           <Auth />
         ) : (
             // Needs to be changed to main screen
-          <Account key={session.user.id} session={session} />
+          <Setup key={session.user.id} session={session} />
         )}
       </div>
     </div>

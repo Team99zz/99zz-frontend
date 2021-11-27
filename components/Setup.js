@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
-import Link from 'next/link'
+import { useRouter } from "next/router";
 
 import styled from "styled-components";
 import CustomAvatar from "./Avatar";
@@ -65,12 +65,36 @@ const CustomInput = styled(Input)`
   border-radius: 0px;
 `;
 
-const SearchInput = styled.input`
+const SearchDiv = styled.div`
+  position: relative;
   width: 300px;
   height: 50px;
-  border-radius: 15px;
-  border: none;
-  text-align: center;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  height: 50px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  padding: 10px 100px 10px 20px;
+  line-height: 1;
+  box-sizing: border-box;
+  outline: none;
+`;
+
+const SearchBtn = styled.button`
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  bottom: 3px;
+  border: 0;
+  background: #244fdf;
+  color: #fff;
+  outline: none;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 100px;
+  z-index: 2;
 `;
 
 const TagContainer = styled.div`
@@ -98,6 +122,7 @@ const TagDesc = styled.p`
 const CustomTag = styled.div`
   font-size: 17px;
   padding: 10px 15px;
+  margin-bottom: 5px;
   vertical-align: middle;
   border: 1px solid black;
   border-radius: 25px;
@@ -113,11 +138,11 @@ const SignOutButton = styled(Button)`
   box-shadow: none;
 `;
 
-const closeTag = () => {
-  console.log("Close Tag");
-};
+export default function Setup({ session }) {
+  const router = useRouter();
 
-export default function Account({ session }) {
+  const [input, setInput] = useState("");
+  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [id, setId] = useState(null);
   const [username, setUsername] = useState(null);
@@ -127,6 +152,25 @@ export default function Account({ session }) {
   useEffect(() => {
     getProfile();
   }, [session]);
+
+  const onChange = (e) => {
+    const { value } = e.target;
+    setInput(value);
+  };
+
+  const onKeyDown = (e) => {
+    const { key } = e;
+
+    if (key === "Enter") {
+      e.preventDefault();
+      setTags((prevState) => [...prevState, input]);
+      setInput("");
+    }
+  };
+
+  const closeTag = (index) => {
+    setTags((prevState) => prevState.filter((tag, i) => i !== index));
+  };
 
   async function getProfile() {
     try {
@@ -173,6 +217,28 @@ export default function Account({ session }) {
       let { error } = await supabase.from("user").upsert(updates, {
         returning: "minimal", // Don't return the value after inserting
       });
+
+      if (error) {
+        throw error;
+      }
+      updateInterests();
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+      router.push("feed");
+    }
+  }
+
+  async function updateInterests() {
+    try {
+      setLoading(true);
+      const user = supabase.auth.user();
+      // 준영아 좀 해줘
+      const { error } = await supabase
+        .from("interest")
+        .upsert(tags, { returning: "minimal" })
+        .eq("id", user.id)
 
       if (error) {
         throw error;
@@ -226,16 +292,25 @@ export default function Account({ session }) {
           <br />
           클릭해서 수정할 수 있습니다
         </TagDesc>
-        <SearchInput placeholder="아무거나 입력하기" />
-        <TagDiv>
-          <CustomTag closable>
-            Tag 2
-            <div>
-              <CloseOutlined onClick={closeTag} />
-            </div>
-          </CustomTag>
-         
+        <SearchDiv>
+          <SearchInput
+            placeholder="아무거나 입력하기"
+            value={input}
+            onKeyPress={onKeyDown}
+            onChange={onChange}
+          />
+          <SearchBtn>추가하기</SearchBtn>
+        </SearchDiv>
 
+        <TagDiv>
+          {tags.map((tag, index) => (
+            <CustomTag key={index}>
+              {tag}
+              <div>
+                <CloseOutlined onClick={() => closeTag(index)} />
+              </div>
+            </CustomTag>
+          ))}
         </TagDiv>
       </TagContainer>
 
@@ -248,16 +323,11 @@ export default function Account({ session }) {
         </StartButton>
       </div>
 
-      <Link href="/feed">
-          <a>Feed</a>
-        </Link>
-
       <div>
         <SignOutButton onClick={() => supabase.auth.signOut()}>
           다른 계정으로 시작하기
         </SignOutButton>
       </div>
-
     </AccountDiv>
   );
 }
