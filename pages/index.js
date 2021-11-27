@@ -1,6 +1,4 @@
 import Head from "next/head";
-import { useState, useEffect } from "react";
-import { supabase } from "../utils/supabaseClient";
 
 import Auth from "../components/Auth";
 import Setup from "../components/Setup";
@@ -16,7 +14,7 @@ export default function Home(props) {
         {!props.session ? (
           <Auth />
         ) : (
-            // Needs to be changed to main screen
+          // Needs to be changed to main screen
           <Setup key={props.session.user.id} session={props.session} />
         )}
       </div>

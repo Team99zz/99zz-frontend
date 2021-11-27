@@ -7,10 +7,11 @@ import { supabase } from "../utils/supabaseClient";
 
 function MyApp({ Component, pageProps }) {
   const [session, setSession] = useState(null);
-
+  const [userId, setUserId] = useState(null);
   useEffect(() => {
     setSession(supabase.auth.session());
-
+    const user = supabase.auth.user();
+    setUserId(user.id);
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -19,7 +20,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <div>
       <Component session={session} {...pageProps} />
-      <Nav></Nav>
+      <Nav userId={userId}></Nav>
     </div>
   );
 }
