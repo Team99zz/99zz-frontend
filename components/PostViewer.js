@@ -39,13 +39,43 @@ const WhiteBlock = styled.div`
 //uid, pid로 Query해서 convertFromRaw안에 넣어주면 됨
 
 export default function PostViewer(props){
-    console.log(props.data)
+    const [loading, setLoading] = useState(true);
+    const [titleState, setTitleState] = useState("");
+    const [subTitleState, setSubTitleState] = useState("");
+    const [loadedData, setLoadedData] = useState('');
+    const [editorState, setEditorState] = useState(EditorState.createEmpty());
+    useEffect(() => {
+        getPosting(props.data.pid);
+    })
+
+    async function getPosting(pid) {
+        try {
+            setLoading(true);
+            const pid2 = window.location.pathname.split("/")[3];
+            let { data, error } = await supabase
+                .from('posting')
+                .select('*')
+                .eq('id', pid2)
+                .single();
+            setTitleState(data.title);
+            setSubTitleState(data.subtitle);
+            setEditorState(EditorState.createWithContent(convertFromRaw(data.content)))
+            if (error && status !== 406) {
+                throw error;
+            }
+        }
+        catch (error) {
+            alert(error.message);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+ 
 
 
-    const state = convertFromRaw(props.data.content);
-    const [editorState, setEditorState] = useState(EditorState.createWithContent(state));
-
-
+    
     const getBlockStyle = (block) => {
         return block.getType();
     }
@@ -56,10 +86,10 @@ export default function PostViewer(props){
             </Header>
             <WhiteBlock>
                 <PostTitle>
-                    {props.data.title}
+                    {titleState}
                 </PostTitle>
                 <PostSubTitle>
-                    {props.data.subtitle}
+                    {subTitleState}
                 </PostSubTitle>
                 <div>
                     김뜼똘
