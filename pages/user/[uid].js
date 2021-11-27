@@ -4,6 +4,8 @@ import { supabase } from "../../utils/supabaseClient";
 import styled from "styled-components";
 
 import UserProfileCard from "../../components/profile/UserProfileCard";
+import UserNavCard from "../../components/profile/UserNavCard";
+import Select from "react-select";
 
 const AccountDiv = styled.div`
   margin-top: 10px;
@@ -12,7 +14,38 @@ const AccountDiv = styled.div`
   padding: 10px 15px;
   margin-bottom: 10px;
 `;
+
+const MyFeedDiv = styled.div`
+  margin-top: 10px;
+`;
+
+const CustomSelect = styled(Select)`
+  & .css-1s2u09g-control {
+    border-radius: 14px;
+    background-color: #244fdf;
+    color: #fff;
+    border: none;
+  }
+  & .css-qc6sy-singleValue {
+    color: #fff;
+  }
+  &.css-1hb7zxy-IndicatorsContainer > div > svg > path {
+      color: #fff;
+  }
+  &.css-6j8wv5-Input{
+    color: #fff;
+    ::placeholder{
+        color: #fff;
+    }
+  }
+`;
 // import PostViewer from "../../components/PostViewer";
+
+const options = [
+  { value: "chocolate", label: "Chocolate" },
+  { value: "strawberry", label: "Strawberry" },
+  { value: "vanilla", label: "Vanilla" },
+];
 
 const User = ({ session }) => {
   const [loading, setLoading] = useState(true);
@@ -63,6 +96,10 @@ const User = ({ session }) => {
         title={title}
         avatar_url={avatar_url}
       ></UserProfileCard>
+      <UserNavCard></UserNavCard>
+      <MyFeedDiv>
+        <CustomSelect options={options} />
+      </MyFeedDiv>
     </AccountDiv>
   );
 };

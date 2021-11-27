@@ -32,7 +32,8 @@ const SettingsDiv = styled.div`
 `;
 
 const SettingsP = styled.p`
-    font-size: 12px;
+  font-size: 12px;
+  padding-left: 3px;
   margin-bottom: 0px;
 `;
 
@@ -47,7 +48,7 @@ export default function UserProfileCard(props) {
       <Title>{props.title}</Title>
       <Username>{props.username}</Username>
       <SettingsDiv>
-        <MdSettings></MdSettings>
+        <MdSettings size={15}></MdSettings>
         <SettingsP>설정</SettingsP>
       </SettingsDiv>
     </UserProfileCardDiv>
