@@ -54,6 +54,7 @@ const PublicCard = styled.div`
   border-radius: 18px;
   padding: 10px 20px;
   text-align: center;
+  margin-bottom: 10px;
 `;
 
 const PCardP = styled.p`
@@ -100,8 +101,21 @@ export default function Feed({ session }) {
       const user = await supabase.auth.user();
 
       let { data: posting, error } = await supabase
-        .from("posting")
-        .select("user, title, subtitle, created_at, thumbnail");
+          .from("posting")
+          .select("user, title, subtitle, created_at, thumbnail");
+
+      posting = await Promise.all(
+          posting.map( async p => {
+            let {data, error } = await supabase
+                .from('user')
+                .select('title, avatar_url')
+                .eq("id", p.user)
+                .single();
+            return {...p, ...{blog_title:data.title, avatar_url: data.avatar_url}}
+          })
+      )
+
+      console.log(posting)
 
       if (error && status !== 406) {
         throw error;
@@ -115,6 +129,7 @@ export default function Feed({ session }) {
       setLoading(false);
     }
   }
+
 
   const onAfterChange = (value) => {
     // value.preventDefault();
