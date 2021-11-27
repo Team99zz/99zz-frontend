@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Editor, EditorState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw, convertFromRaw } from "draft-js";
+import { Editor, EditorState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { mediaBlockRenderer } from "./TextEditorImage";
+import { mediaBlockRenderer } from "./PostEditorImage";
 import { Input, Slider, Select, Button } from "antd";
 import { supabase } from "../utils/supabaseClient";
 import { MdFormatAlignLeft, MdOutlineImage, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
@@ -147,11 +147,9 @@ const PostSetting = styled.div`
     }
 `;
 
-
 const CustomSlider = styled(Slider)`
     margin-bottom : 50px;
 `;
-
 
 const marks = {
     0: "나",
@@ -159,8 +157,6 @@ const marks = {
     66: "팔로잉",
     100: "전체",
 };
-
-
 
 export default function TextEditor({ uuid }) {
     const [titleState, setTitleState] = useState("");
@@ -189,7 +185,6 @@ export default function TextEditor({ uuid }) {
                 .upload(filePath, file);
 
             if (uploadError) {
-                console.log(uploadError)
                 throw uploadError;
             }
             const { publicURL, error } = supabase
@@ -257,7 +252,7 @@ export default function TextEditor({ uuid }) {
         uploadImage(event);
     }
     const getBlockStyle = (block) => {
-        return block.getType();;
+        return block.getType();
     }
 
 
@@ -303,6 +298,8 @@ export default function TextEditor({ uuid }) {
             boundary: revealRange,
             sentiment: 0
         }
+
+        console.log(JSON.stringify(query));
         const { data, error } = await supabase
             .from('posting')
             .upsert(query)
@@ -311,7 +308,7 @@ export default function TextEditor({ uuid }) {
 
     }
 
-    function selectionChange(value){
+    function selectionChange(value) {
 
     }
 
@@ -334,7 +331,7 @@ export default function TextEditor({ uuid }) {
                     onChange={(event) => setSubTitleState(event.target.value)}
                 />
             </Title>
-            
+
             <EditorComponent>
                 <Editor
                     editorState={editorState}
@@ -344,7 +341,7 @@ export default function TextEditor({ uuid }) {
                     blockRendererFn={mediaBlockRenderer}
                 />
             </EditorComponent>
-            
+
             <ToolbarComponent>
                 <div>
                     <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>
@@ -415,7 +412,7 @@ export default function TextEditor({ uuid }) {
                 onClick={handleSubmit}>
                 글 쓰기
             </SubmitButton>
-            
+
         </div>
     );
 
