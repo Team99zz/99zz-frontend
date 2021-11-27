@@ -38,7 +38,7 @@ const Nav = (props) => {
     case "/feed":
       active = "feed";
       break;
-    case "/post":
+    case "/newpost":
       active = "post";
       break;
     case "/account":
@@ -72,12 +72,12 @@ const Nav = (props) => {
               <MdOutlineDriveFileRenameOutline
                 size="30"
                 color="#244FDF"
-                onClick={() => router.push("/post")}
+                onClick={() => router.push("/newpost")}
               />
             ) : (
               <MdOutlineDriveFileRenameOutline
                 size="30"
-                onClick={() => router.push("/post")}
+                onClick={() => router.push("/newpost")}
               />
             )}
           </BtnTab>
