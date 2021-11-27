@@ -53,19 +53,6 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
 
-  const handleLogin = async (email) => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signIn({ email });
-      if (error) throw error;
-      alert("Check your email for the login link!");
-    } catch (error) {
-      alert(error.error_description || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   async function googleLogin() {
     try {
       setLoading(true);
@@ -73,8 +60,6 @@ export default function Auth() {
         provider: "google",
       });
       if (error) throw error;
-      console.log(error);
-      //   alert("Google login not working")
     } catch (error) {
       alert(error.error_description || error.message);
     } finally {
@@ -96,7 +81,7 @@ export default function Auth() {
           size="large"
           onClick={(e) => {
             e.preventDefault();
-            googleLogin(email);
+            googleLogin();
           }}
           disabled={loading}
         >
