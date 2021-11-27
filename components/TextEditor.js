@@ -3,12 +3,26 @@ import styled from "styled-components";
 import { Editor, EditorState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { mediaBlockRenderer } from "./TextEditorImage";
-import { Input, Slider } from "antd";
+import { Input, Slider, Select, Button } from "antd";
 import { supabase } from "../utils/supabaseClient";
+import { MdFormatAlignLeft, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
+import { BiFontSize } from 'react-icons/bi'
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 
+const CategorySelect = styled(Select)`
+    width :100%;
+`;
+const SubmitButton = styled(Button)`
+  background-color: #244fdf;
+  width: 100%;
+  height: 50px;
+  border-radius: 15px;
+  color: #fff;
+  font-size: 20px;
+`;
 const Title = styled.div`
     
     TextArea {
@@ -17,6 +31,8 @@ const Title = styled.div`
         border: none;
         margin: 0.5rem 0;
         border-radius: 0.5rem;
+        font-size : 24px;
+        font-weight : bolder;
     }
     TextArea:focus{
         outline: none;
@@ -25,41 +41,65 @@ const Title = styled.div`
         font-size : 30px;
     }
     .subTitle{
-        font-size : 14px;
+        font-size : 16px;
+        color : gray;
+        fonr-weight : bold;
     }
 `
 const EditorComponent = styled.div`
     .texteditor {
         width: 40rem;
+        
     }
 
     .DraftEditor-root {
         border: 1px solid #eee;
         margin: 0.5rem 0;
         border-radius: 0.5rem;
+        
     }
 
     .DraftEditor-editorContainer {
         padding: 1.5rem;
+        line-height : 200%;
     }
 
     .public-DraftEditor-content {
         min-height: 20rem;
         
+        
     }
-    .align-right div {
-        text-align: right;
+    .h3{
+        font-size : 20px;
+        font-weight : bolder;
     }
-    .align-center div {
+    .h2{
+        font-size : 18px;
+        font-weight : bold;
+    }
+    .h1{
+        font-size : 16px;
+        font-weight : bold;
+    }
+    .h0{
+        font-size : 14px;
+        font-weight : normal;
+    }
+
+    .a0 div{
+        text-align: left;
+    }
+    .a1 div{
         text-align: center;
     }
-    .align-left div {
-        text-align: left;
+    .a2 div{
+        text-align: right;
     }
 
 
 `;
 const ToolbarComponent = styled.div`
+    
     .hidden{
         display : none;
     }
@@ -69,22 +109,31 @@ const ToolbarComponent = styled.div`
         padding: 0.5rem 1rem;
     }
 `;
+const CustomSlider = styled(Slider)``;
+
+const marks = {
+    0: "나",
+    33: "친구",
+    66: "팔로잉",
+    100: "전체",
+};
 
 
 
-export default function TextEditor() {
+export default function TextEditor({ uuid }) {
     const [titleState, setTitleState] = useState("");
     const [subTitleState, setSubTitleState] = useState("");
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
-    
-    const [revealRange, setRevealRange] = useState(4);
-
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [revealRange, setRevealRange] = useState(100);
+    const [categoryState, setCategoryState] = useState(0);
+    const [thumnail, setThumnail] = useState(null);
 
     async function uploadImage(event) {
-        try{
+        try {
             setUploadingImage(true);
 
-            if(!event.target.files || event.target.files.length === 0){
+            if (!event.target.files || event.target.files.length === 0) {
                 throw new Error("Select Image to upload");
             }
 
@@ -92,7 +141,7 @@ export default function TextEditor() {
             const fileExt = file.name.split(".").pop();
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${fileName}`;
-            
+
             let { error: uploadError } = await supabase.storage
                 .from("images")
                 .upload(filePath, file);
@@ -105,9 +154,9 @@ export default function TextEditor() {
                 .storage
                 .from("images")
                 .getPublicUrl(filePath)
-            console.log(publicURL)
+            if (thumnail == null) setThumnail(publicURL);
             const contentState = editorState.getCurrentContent();
-            const contentStateWithEntity = contentState.createEntity("image", "IMMUTABLE", { src : publicURL });
+            const contentStateWithEntity = contentState.createEntity("image", "IMMUTABLE", { src: publicURL });
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
             const newEditorState = EditorState.set(editorState, {
                 currentContent: contentStateWithEntity
@@ -137,41 +186,94 @@ export default function TextEditor() {
     };
     const handleBlockClick = (e, blockType) => {
         e.preventDefault();
-        console.log("Cur" + RichUtils.getCurrentBlockType(editorState));
-        setEditorState(RichUtils.toggleBlockType(editorState, blockType));
+        let currentBlockType = String(RichUtils.getCurrentBlockType(editorState)).split(" ");
+        if (currentBlockType.length === 1) {
+            currentBlockType.pop();
+            currentBlockType.push("a0");
+            currentBlockType.push("h0");
+        }
+        if (blockType == "init") {
+            currentBlockType = [];
+            currentBlockType.push("a0");
+            currentBlockType.push("h0");
+        }
+        else if (blockType == "a") {
+            currentBlockType[0] = "a" + String((Number(currentBlockType[0][1]) + 1) % 3);
+        }
+        else if (blockType == "h") {
+            currentBlockType[1] = "h" + String((Number(currentBlockType[1][1]) + 1) % 4);
+        }
+        else {
+            currentBlockType = [blockType];
+        }
+        let newBlockType = currentBlockType.join(" ");
+        console.log("handleBlockClick", newBlockType);
+        setEditorState(RichUtils.toggleBlockType(editorState, newBlockType));
     };
 
     const handleInsertImage = (event) => {
-        console.log(event.target.files[0]);
         uploadImage(event);
     }
     const getBlockStyle = (block) => {
-        block.
-        console.log(block.getType());
-        switch (block.getType()) {
-            
-            case 'left':
-                return 'align-left';
-            case 'center':
-                return 'align-center';
-            case 'right':
-                return 'align-right';
-            default:
-                return null;
+        return block.getType();;
+    }
+
+
+
+
+    const handleSubmit = async () => {
+        const content = convertToRaw(editorState.getCurrentContent());
+        console.log(content);
+        //제목 확인
+        if (titleState == "") {
+            alert("제목을 입력해주세요.");
+            return;
         }
+        //본문 확인
+        let check = true;
+        for (const block of content.blocks) {
+            if (block.text != "") {
+                check = false;
+                break;
+            }
+        }
+        if (check) {
+            alert("본문을 입력해주세요.");
+            return;
+        }
+        if (subTitleState == "") {
+            let subTitle = "";
+            let i = 0;
+            while (subTitle.length < 50 && i < content.blocks.length) {
+                subTitle += (content.blocks[i].text + " ");
+                i++;
+            }
+            setSubTitleState(subTitle);
+        }
+
+        const query = {
+            user: uuid,
+            category: categoryState,
+            title: titleState,
+            subtitle: subTitleState,
+            content: JSON.stringify(content),
+            thumnail: thumnail,
+            boundary: revealRange,
+            sentiment: 0
+        }
+        const { data, error } = await supabase
+            .from('posting')
+            .upsert(query)
+
+
+
+    }
+
+    function selectionChange(value){
+
     }
 
 
-
-
-    const handleSubmit = () => {
-        const data = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
-        console.log(titleState, subTitleState, data)
-    }
-
-    function formatter(value) {
-        return `공개할 단계가 ${value + 1} 단계입니다.`;
-    }
 
 
     return (
@@ -200,24 +302,35 @@ export default function TextEditor() {
                 />
             </EditorComponent>
             <ToolbarComponent>
-                <button onMouseDown={(event) => handleBlockClick(event, "unstyled")}>일반</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "header-one")}>제목1</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "header-two")}>제목2</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "header-three")}>제목3</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "ordered-list-item")}>번호</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "unordered-list-item")}>점</button>
-            </ToolbarComponent>
-            <ToolbarComponent>
-                <button onMouseDown={(event) => handleBlockClick(event, "align-left")}>왼쪽</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "align-center")}>중앙</button>
-                <button onMouseDown={(event) => handleBlockClick(event, "align-right")}>오른쪽</button>
-            </ToolbarComponent>
-            <ToolbarComponent>
-                <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>두껍게</button>
-                <button onMouseDown={(event) => handleToggleClick(event, "ITALIC")}>기울이기</button>
-                <button onMouseDown={(event) => handleToggleClick(event, "STRIKETHROUGH")}>밑줄</button>
-            </ToolbarComponent>
-            <ToolbarComponent>
+                문단 모양
+                <button onMouseDown={(event) => handleBlockClick(event, "h")}>
+                    <BiFontSize />
+                </button>
+                <button onMouseDown={(event) => handleBlockClick(event, "a")}>
+                    <MdFormatAlignLeft />
+                </button>
+                <button onMouseDown={(event) => handleBlockClick(event, "ordered-list-item")}>
+                    <MdFormatListBulleted />
+                </button>
+                <button onMouseDown={(event) => handleBlockClick(event, "unordered-list-item")}>
+                    <MdFormatListBulleted />
+                </button>
+                글자 모양
+                <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>
+                    <MdFormatBold />
+                </button>
+                <button onMouseDown={(event) => handleToggleClick(event, "ITALIC")}>
+                    <MdFormatItalic />
+                </button>
+                <button onMouseDown={(event) => handleToggleClick(event, "STRIKETHROUGH")}>
+                    <MdFormatStrikethrough />
+                </button>
+                <button
+                    onClick={() => {
+                        document.getElementById("fileInput").click()
+                    }}
+                >사진
+                </button>
                 <input
                     type="file"
                     id="fileInput"
@@ -227,38 +340,35 @@ export default function TextEditor() {
 
                     onChange={(event) => handleInsertImage(event)}
                 />
-                <button
-                    onClick={() => {
-                        document.getElementById("fileInput").click()
-                    }}
-                >
-                    사진
-                </button>
-
             </ToolbarComponent>
+
             <div>
                 <h2>공개 범위</h2>
-                <Slider
-                    value={revealRange}
-                    min={0}
-                    max={4}
+                <CustomSlider
+                    defaultValue={33}
+                    marks={marks}
+                    step={null}
                     onChange={(value) => setRevealRange(value)}
-                    tooltipVisible={true}
-                    tooltipPlacement={"bottom"}
-                    dots={true}
-                    tipFormatter={formatter}
+                    tipFormatter={null}
+                    trackStyle={{ backgroundColor: "#244FDF" }}
+                    handleStyle={{ borderColor: "#244FDF" }}
                 />
 
-                <h3>
-                    글 보는 단계가 {revealRange + 1} 단계임 ㅅㄱ
-                </h3>
+            </div>
+            <div>
+                <h2>카테고리</h2>
+                <CategorySelect>
+                    <Option>
+                        Hello World
+                    </Option>
+                </CategorySelect>
 
             </div>
-            <button
-                onClick={handleSubmit}
-            >
-                보내기
-            </button>
+            <SubmitButton
+                onClick={handleSubmit}>
+
+            글 쓰기
+            </SubmitButton>
         </div>
     );
 
