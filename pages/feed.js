@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { BackTop, Slider } from "antd";
+import "moment/locale/ko";
 
 import {
   MdNotificationsNone,
@@ -12,6 +13,7 @@ import {
 import Nav from "../components/Nav";
 import styled from "styled-components";
 import FeedCard from "../components/feed/feedCard";
+import moment from "moment";
 
 const TopBar = styled.div`
   width: 100%;
@@ -102,7 +104,7 @@ export default function Feed({ session }) {
 
       let { data: posting, error } = await supabase
           .from("posting")
-          .select("user, title, subtitle, created_at, thumbnail");
+          .select("id, user, title, subtitle, created_at, thumbnail");
 
       posting = await Promise.all(
           posting.map( async p => {
@@ -111,7 +113,15 @@ export default function Feed({ session }) {
                 .select('title, avatar_url')
                 .eq("id", p.user)
                 .single();
-            return {...p, ...{blog_title:data.title, avatar_url: data.avatar_url}}
+
+            return {
+              ...p,
+              ...{
+                blog_title:data.title,
+                avatar_url: data.avatar_url,
+                time_ago: moment(p.created_at).fromNow()
+              }
+            }
           })
       )
 
