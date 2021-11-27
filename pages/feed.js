@@ -11,6 +11,7 @@ import {
 
 import Nav from "../components/Nav";
 import styled from "styled-components";
+import FeedCard from "../components/feed/feedCard";
 
 const TopBar = styled.div`
   width: 100%;
@@ -72,29 +73,12 @@ const marks = {
   100: "전체",
 };
 
-const onChange = (value) => {
-  value.preventDefault();
-  switch (value) {
-    case 0:
-      setSliderValue("나");
-      break;
-    case 33:
-      setSliderValue("친구");
-      break;
-    case 66:
-      setSliderValue("팔로잉");
-      break;
-    case 100:
-      setSliderValue("전체");
-      break;
-    default:
-      break;
-  }
-};
-
-export default function Feed() {
+export default function Feed({ session }) {
+  const [loading, setLoading] = useState(true);
   const [dropdownActive, setDropdownActive] = useState(false);
   const [sliderValue, setSliderValue] = useState("친구");
+  const [sliderNumber, setSliderNumber] = useState("33명");
+  const [feed, setFeed] = useState([]);
 
   // const [session, setSession] = useState(null);
 
@@ -105,6 +89,56 @@ export default function Feed() {
   //     setSession(session);
   //   });
   // }, []);
+
+  useEffect(() => {
+    getFeed();
+  }, [session]);
+
+  async function getFeed() {
+    try {
+      setLoading(true);
+      const user = await supabase.auth.user();
+
+      let { data: posting, error } = await supabase
+        .from("posting")
+        .select("user, title, subtitle, created_at, thumbnail");
+
+      if (error && status !== 406) {
+        throw error;
+      }
+      if (posting) {
+        setFeed(posting);
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const onAfterChange = (value) => {
+    // value.preventDefault();
+    switch (value) {
+      case 0:
+        setSliderValue("나");
+        setSliderNumber(null);
+        break;
+      case 33:
+        setSliderValue("친구");
+        setSliderNumber("23명");
+        break;
+      case 66:
+        setSliderValue("팔로잉");
+        setSliderNumber("45명");
+        break;
+      case 100:
+        setSliderValue("전체");
+        setSliderNumber("156명");
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <FeedDiv>
@@ -129,20 +163,35 @@ export default function Feed() {
         </RightDiv>
       </TopBar>
       <FeedInnerDiv>
-        <PublicCard>
-          <PCardP>
-            <PCardPSpan>{sliderValue} 123명</PCardPSpan>의 이야기를 보고 있어요!
-          </PCardP>
-          <CustomSlider
-            onchange={onChange}
-            marks={marks}
-            step={null}
-            defaultValue={33}
-            tipFormatter={null}
-            trackStyle={{ backgroundColor: "#244FDF" }}
-            handleStyle={{ borderColor: "#244FDF" }}
-          />
-        </PublicCard>
+        {dropdownActive ? (
+          <PublicCard>
+            <PCardP>
+              <PCardPSpan>
+                {sliderValue} {sliderNumber}
+              </PCardPSpan>
+              의 이야기를 보고 있어요!
+            </PCardP>
+            <CustomSlider
+              onAfterChange={onAfterChange}
+              marks={marks}
+              step={null}
+              defaultValue={33}
+              tipFormatter={null}
+              trackStyle={{ backgroundColor: "#244FDF" }}
+              handleStyle={{ borderColor: "#244FDF" }}
+            />
+          </PublicCard>
+        ) : (
+          <></>
+        )}
+        {feed.map((posting, index) => (
+          <FeedCard
+            key={index}
+            title={posting.title}
+            subtitle={posting.subtitle}
+            thumbnail={posting.thumbnail}
+          ></FeedCard>
+        ))}
       </FeedInnerDiv>
       <Nav name="feed"></Nav>
     </FeedDiv>

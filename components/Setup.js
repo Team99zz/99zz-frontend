@@ -177,8 +177,6 @@ export default function Setup({ session }) {
     try {
       setLoading(true);
       const user = supabase.auth.user();
-      // Sending user UUID
-      console.log(user.id);
 
       let { data, error, status } = await supabase
         .from("user")
