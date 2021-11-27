@@ -26,7 +26,7 @@ const WhiteBlock = styled.div`
     margin-bottom : 20px;
 `;
 
-export default function PostViewer({postid}){
+export default function PostViewer({userid, postid}){
     const dummy = {
         category: 0,
         title: "테스트 제목",
