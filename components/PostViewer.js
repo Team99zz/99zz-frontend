@@ -29,6 +29,11 @@ const WhiteBlock = styled.div`
     margin-bottom : 20px;
 `;
 
+//params[0] uid
+//params[1] pid
+
+//uid, pid로 Query해서 convertFromRaw안에 넣어주면 됨
+
 export default function PostViewer({params}){
     console.log(params)
     const dummy = {
