@@ -302,15 +302,15 @@ export default function TextEditor({ session }) {
             title: titleState,
             subtitle: subTitleState,
             content: JSON.stringify(content),
-            thumnail: thumnail,
+            thumbnail: thumnail,
             boundary: revealRange,
             sentiment: 0
         }
 
         console.log(JSON.stringify(query));
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('posting')
-            .upsert(query)
+            .insert(query)
 
 
 
