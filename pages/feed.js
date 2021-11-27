@@ -141,59 +141,61 @@ export default function Feed({ session }) {
   };
 
   return (
-    <FeedDiv>
-      <TopBar>
-        <DropdownBtn>
-          <DropdownP>친구들의 구구절절</DropdownP>
+    <div>
+      <FeedDiv>
+        <TopBar>
+          <DropdownBtn>
+            <DropdownP>친구들의 구구절절</DropdownP>
+            {dropdownActive ? (
+              <MdKeyboardArrowUp
+                size="25"
+                onClick={() => setDropdownActive(false)}
+              />
+            ) : (
+              <MdKeyboardArrowDown
+                onClick={() => setDropdownActive(true)}
+                size="25"
+              />
+            )}
+          </DropdownBtn>
+          <RightDiv>
+            <MdNotificationsNone size="25"></MdNotificationsNone>
+            <MdOutlineSearch size="25"></MdOutlineSearch>
+          </RightDiv>
+        </TopBar>
+        <FeedInnerDiv>
           {dropdownActive ? (
-            <MdKeyboardArrowUp
-              size="25"
-              onClick={() => setDropdownActive(false)}
-            />
+            <PublicCard>
+              <PCardP>
+                <PCardPSpan>
+                  {sliderValue} {sliderNumber}
+                </PCardPSpan>
+                의 이야기를 보고 있어요!
+              </PCardP>
+              <CustomSlider
+                onAfterChange={onAfterChange}
+                marks={marks}
+                step={null}
+                defaultValue={33}
+                tipFormatter={null}
+                trackStyle={{ backgroundColor: "#244FDF" }}
+                handleStyle={{ borderColor: "#244FDF" }}
+              />
+            </PublicCard>
           ) : (
-            <MdKeyboardArrowDown
-              onClick={() => setDropdownActive(true)}
-              size="25"
-            />
+            <></>
           )}
-        </DropdownBtn>
-        <RightDiv>
-          <MdNotificationsNone size="25"></MdNotificationsNone>
-          <MdOutlineSearch size="25"></MdOutlineSearch>
-        </RightDiv>
-      </TopBar>
-      <FeedInnerDiv>
-        {dropdownActive ? (
-          <PublicCard>
-            <PCardP>
-              <PCardPSpan>
-                {sliderValue} {sliderNumber}
-              </PCardPSpan>
-              의 이야기를 보고 있어요!
-            </PCardP>
-            <CustomSlider
-              onAfterChange={onAfterChange}
-              marks={marks}
-              step={null}
-              defaultValue={33}
-              tipFormatter={null}
-              trackStyle={{ backgroundColor: "#244FDF" }}
-              handleStyle={{ borderColor: "#244FDF" }}
-            />
-          </PublicCard>
-        ) : (
-          <></>
-        )}
-        {feed.map((posting, index) => (
-          <FeedCard
-            key={index}
-            title={posting.title}
-            subtitle={posting.subtitle}
-            thumbnail={posting.thumbnail}
-          ></FeedCard>
-        ))}
-      </FeedInnerDiv>
-      <Nav name="feed"></Nav>
-    </FeedDiv>
+          {feed.map((posting, index) => (
+            <FeedCard
+              key={index}
+              title={posting.title}
+              subtitle={posting.subtitle}
+              thumbnail={posting.thumbnail}
+            ></FeedCard>
+          ))}
+        </FeedInnerDiv>
+      </FeedDiv>
+      <Nav name="feed" />
+    </div>
   );
 }
