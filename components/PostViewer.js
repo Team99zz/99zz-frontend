@@ -3,29 +3,96 @@ import styled from "styled-components";
 import { EditorState, ContentState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw, convertFromRaw, createWithContent } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { mediaBlockRenderer } from "./PostEditorImage";
-import { Input, Slider, Select, Button } from "antd";
+import {Input, Slider, Select, Button, Avatar} from "antd";
 import { supabase } from "../utils/supabaseClient";
 import { MdFormatAlignLeft, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
 import { BiFontSize } from 'react-icons/bi'
 import dynamic from "next/dynamic";
 
+import {
+    MdKeyboardBackspace,
+    MdIosShare,
+    MdPersonAddAlt,
+    MdThumbUpOffAlt,
+    MdOutlineComment,
+} from "react-icons/md"
+import {UserOutlined} from "@ant-design/icons";
+
 const Editor = dynamic(
     () => import('draft-js').then(mod => mod.Editor),
     { ssr: false }
 )
-const Header = styled.div`
 
-
+const PostingDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
 `;
+
+const TopBar = styled.div`
+  width: 100%;
+  display : flex;
+  flex-direction : row;
+  justify-content: space-between;
+  background-color: #f5f5f5;
+`;
+
+const BackspaceDiv = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px;
+`
+
+const BlankDiv = styled.div`
+  width: 24px;
+  margin: 20px;
+`;
+
+const BlogTitle = styled.div`
+  text-align: center;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 40px;
+  align-items: center;
+`;
+
 const PostTitle = styled.div`
     font-size : 24px;
     font-weight : bolder;
+    line-height: 24px;
 `;
 const PostSubTitle = styled.div`
     font-size : 16px;
-    color : gray;
-    fonr-weight : bold;
+    color : #1b1b1f;
+    font-weight : normal;
+    line-height: 18px;
+    margin-top: 20px;
 `;
+
+const SubSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+`;
+
+const UserSection = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const UserP = styled.p`
+  font-size: 11px;
+  font-weight: 700;
+  padding-left: 10px;
+  margin: 0;
+`;
+
+const MarginDiv = styled.div`
+  width: 5px`;
+
 const WhiteBlock = styled.div`
     background-color : white;
     border-radius: 15px;
@@ -72,18 +139,26 @@ export default function PostViewer(props){
         }
     }
 
- 
 
-
-    
     const getBlockStyle = (block) => {
         return block.getType();
     }
     return(
-        <div>
-            <Header>
+        <PostingDiv>
+            <TopBar>
+                <BackspaceDiv>
+                    <MdKeyboardBackspace
+                        size="24"
+                        height="40"/>
+                </BackspaceDiv>
+                <BackspaceDiv>
+                    <BlogTitle>
+                        블로그 이름 넣아야 함
+                    </BlogTitle>
+                </BackspaceDiv>
+                <BlankDiv>{" "}</BlankDiv>
+            </TopBar>
 
-            </Header>
             <WhiteBlock>
                 <PostTitle>
                     {titleState}
@@ -91,10 +166,27 @@ export default function PostViewer(props){
                 <PostSubTitle>
                     {subTitleState}
                 </PostSubTitle>
-                <div>
-                    김뜼똘
-                </div>
+                <SubSection>
+                    <UserSection>
+                        <div>
+                            {props.avatarUrl === null ? (
+                                <Avatar size={30} icon={<UserOutlined />} />
+                            ) : (
+                                <Avatar size={30} src={props.avatarUrl} />
+                            )}
+                        </div>
+                        <UserP>이름 넣어야 함</UserP>
+                    </UserSection>
+                    <div>
+                        <MdIosShare
+                            size="24"/>
+                        <MdPersonAddAlt
+                            size="24"/>
+                    </div>
+                </SubSection>
+
             </WhiteBlock>
+
             <WhiteBlock>
                 <Editor
                     editorState={editorState}
@@ -105,7 +197,7 @@ export default function PostViewer(props){
             </WhiteBlock>
 
 
-        </div>
+        </PostingDiv>
     )
 
 
