@@ -53,6 +53,7 @@ const StartButton = styled(Button)`
   border-radius: 15px;
   color: #fff;
   font-size: 20px;
+  margin-top: 10px;
 `;
 
 const CustomInput = styled(Input)`

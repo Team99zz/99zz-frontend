@@ -1,6 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap');
-@import url('http://fonts.cdnfonts.com/css/neometric-2');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap");
+@import url("http://fonts.cdnfonts.com/css/neometric-2");
 
 * {
-   font-family: 'Noto Sans KR', sans-serif;  
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+body {
+   background-color: #f5f5f5 !important;
+}
+
+.ant-slider-dot-active {
+  border-color: #244fdf !important;
 }
