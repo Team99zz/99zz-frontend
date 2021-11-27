@@ -114,6 +114,19 @@ export default function Feed({ session }) {
           })
       )
 
+      posting = await Promise.all(
+          posting.map( async p => {
+            let {data, error } = await supabase
+                .from('user')
+                .select('title, avatar_url')
+                .eq("id", p.user)
+                .single();
+            return {...p, ...data}
+          })
+      )
+
+      console.log(posting)
+
       if (error && status !== 406) {
         throw error;
       }
