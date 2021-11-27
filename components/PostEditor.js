@@ -8,6 +8,7 @@ import { supabase } from "../utils/supabaseClient";
 import { MdFormatAlignLeft, MdOutlineImage, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
 import { BiFontSize } from 'react-icons/bi'
 import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -165,6 +166,7 @@ const marks = {
 };
 
 export default function TextEditor({ session }) {
+    const router = useRouter();
     const [titleState, setTitleState] = useState("");
     const [subTitleState, setSubTitleState] = useState("");
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -308,19 +310,17 @@ export default function TextEditor({ session }) {
         }
 
         console.log(JSON.stringify(query));
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('posting')
             .insert(query)
 
-
+        if(error) throw error;
+        else{
+            const url = `/${data[0].user}/${data[0].id}`;
+            router.push(url)
+        }
 
     }
-
-    function selectionChange(value) {
-
-    }
-
-
 
 
     return (

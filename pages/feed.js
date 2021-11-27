@@ -108,7 +108,8 @@ export default function Feed({ session }) {
 
       let { data: posting, error } = await supabase
         .from("posting")
-        .select("id, user, title, subtitle, created_at, thumbnail");
+        .select("id, user, title, subtitle, created_at, thumbnail")
+          .order("created_at", {ascending:false})
 
       posting = await Promise.all(
         posting.map(async (p) => {
