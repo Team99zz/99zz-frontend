@@ -6,16 +6,14 @@ import styled from "styled-components";
 
 const NoSSREditor = dynamic(() => import("../components/TextEditor"), { ssr: false });
 const PostDiv = styled.div`
-  margin-top: 10px;
   width: 100%;
   height: 100%;
-  padding: 10px 20px;
-  margin-bottom: 10px;
+  padding: 20px;
 `;
 
 const PostInnerDiv = styled.div`
   width: 100%;
-  padding-top: 10px;
+  
 `;
 export default function Write() {
     return (

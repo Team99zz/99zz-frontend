@@ -5,7 +5,7 @@ import "draft-js/dist/Draft.css";
 import { mediaBlockRenderer } from "./TextEditorImage";
 import { Input, Slider, Select, Button } from "antd";
 import { supabase } from "../utils/supabaseClient";
-import { MdFormatAlignLeft, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
+import { MdFormatAlignLeft, MdOutlineImage, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
 import { BiFontSize } from 'react-icons/bi'
 
 const { TextArea } = Input;
@@ -14,6 +14,10 @@ const { Option } = Select;
 
 const CategorySelect = styled(Select)`
     width :100%;
+    div {
+        height : 50px;
+    }
+    
 `;
 const SubmitButton = styled(Button)`
   background-color: #244fdf;
@@ -23,7 +27,10 @@ const SubmitButton = styled(Button)`
   color: #fff;
   font-size: 20px;
   margin-top : 20px;
+  margin-bottom : 100px;
 `;
+
+const iconSize = '1.2rem';
 const Title = styled.div`
     
     TextArea {
@@ -34,12 +41,13 @@ const Title = styled.div`
         border-radius: 0.5rem;
         font-size : 24px;
         font-weight : bolder;
+        padding : 10px;
     }
     TextArea:focus{
         outline: none;
     }
     .title {
-        font-size : 30px;
+        font-size : 24px;
     }
     .subTitle{
         font-size : 16px;
@@ -48,6 +56,7 @@ const Title = styled.div`
     }
 `
 const EditorComponent = styled.div`
+    
     .texteditor {
         width: 40rem;
         
@@ -55,9 +64,7 @@ const EditorComponent = styled.div`
 
     .DraftEditor-root {
         background-color : white;
-        border: 1px solid #eee;
         margin: 0.5rem 0;
-        border-radius: 0.5rem;
         
     }
 
@@ -101,22 +108,39 @@ const EditorComponent = styled.div`
 
 `;
 const ToolbarComponent = styled.div`
+
+    position: sticky;
+    z-index : 999;
+    bottom: 0;
+    left : 0;
+    background-color : #f5f5f5;
+    width : 100%;
+    display : flex;
+    flex-direction : row;
+    justify-content: space-between;
+    
     h3{
-        display :inline;
+        display : inline;
         font-weight : bold;
+        line-height : 32 px;
+        height : 32px;
     }
+
     .hidden{
         display : none;
     }
+
     button {
+        margin : 8px;
         border: none;
         background-color: #f5f5f5 ;
-        padding: 1rem;
     }
 `;
 const PostSetting = styled.div`
     font-weight : bold;
     text-align : center;
+    margin-top : 10px;
+    margin-bottom : 0px;
     padding : 0px 20px;
     h2 { 
         font-weight : bold;
@@ -124,7 +148,9 @@ const PostSetting = styled.div`
 `;
 
 
-const CustomSlider = styled(Slider)``;
+const CustomSlider = styled(Slider)`
+    margin-bottom : 50px;
+`;
 
 
 const marks = {
@@ -308,6 +334,7 @@ export default function TextEditor({ uuid }) {
                     onChange={(event) => setSubTitleState(event.target.value)}
                 />
             </Title>
+            
             <EditorComponent>
                 <Editor
                     editorState={editorState}
@@ -317,49 +344,52 @@ export default function TextEditor({ uuid }) {
                     blockRendererFn={mediaBlockRenderer}
                 />
             </EditorComponent>
-            <ToolbarComponent>
-                <h3>문단 모양</h3>
-                <button onMouseDown={(event) => handleBlockClick(event, "h")}>
-                    <BiFontSize />
-                </button>
-                <button onMouseDown={(event) => handleBlockClick(event, "a")}>
-                    <MdFormatAlignLeft />
-                </button>
-                <button onMouseDown={(event) => handleBlockClick(event, "ordered-list-item")}>
-                    <MdFormatListBulleted />
-                </button>
-                <button onMouseDown={(event) => handleBlockClick(event, "unordered-list-item")}>
-                    <MdFormatListBulleted />
-                </button>
-            </ToolbarComponent>
-            <ToolbarComponent>
-                <h3>글자 모양</h3>
-                <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>
-                    <MdFormatBold />
-                </button>
-                <button onMouseDown={(event) => handleToggleClick(event, "ITALIC")}>
-                    <MdFormatItalic />
-                </button>
-                <button onMouseDown={(event) => handleToggleClick(event, "STRIKETHROUGH")}>
-                    <MdFormatStrikethrough />
-                </button>
-                <button
-                    onClick={() => {
-                        document.getElementById("fileInput").click()
-                    }}
-                >사진
-                </button>
-                <input
-                    type="file"
-                    id="fileInput"
-                    accept='image/*'
-                    multiple
-                    className={"hidden"}
-
-                    onChange={(event) => handleInsertImage(event)}
-                />
-            </ToolbarComponent>
             
+            <ToolbarComponent>
+                <div>
+                    <button onMouseDown={(event) => handleToggleClick(event, "BOLD")}>
+                        <MdFormatBold size={iconSize} />
+                    </button>
+                    <button onMouseDown={(event) => handleToggleClick(event, "ITALIC")}>
+                        <MdFormatItalic size={iconSize} />
+                    </button>
+                    <button onMouseDown={(event) => handleToggleClick(event, "STRIKETHROUGH")}>
+                        <MdFormatStrikethrough size={iconSize} />
+                    </button>
+                </div>
+                <div>
+                    <button onMouseDown={(event) => handleBlockClick(event, "h")}>
+                        <BiFontSize size={iconSize} />
+                    </button>
+                    <button onMouseDown={(event) => handleBlockClick(event, "a")}>
+                        <MdFormatAlignLeft size={iconSize} />
+                    </button>
+                    <button onMouseDown={(event) => handleBlockClick(event, "ordered-list-item")}>
+                        <MdFormatListBulleted size={iconSize} />
+                    </button>
+                    <button onMouseDown={(event) => handleBlockClick(event, "unordered-list-item")}>
+                        <MdFormatListBulleted size={iconSize} />
+                    </button>
+                    <button
+                        onClick={() => {
+                            document.getElementById("fileInput").click()
+                        }}
+                    >
+                        <MdOutlineImage size={iconSize} />
+                    </button>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept='image/*'
+                        multiple
+                        className={"hidden"}
+
+                        onChange={(event) => handleInsertImage(event)}
+                    />
+                </div>
+
+
+            </ToolbarComponent>
             <PostSetting>
                 <h2>공개 범위</h2>
                 <CustomSlider
@@ -371,6 +401,8 @@ export default function TextEditor({ uuid }) {
                     trackStyle={{ backgroundColor: "#244FDF" }}
                     handleStyle={{ borderColor: "#244FDF" }}
                 />
+            </PostSetting>
+            <PostSetting>
                 <h2>카테고리</h2>
                 <CategorySelect>
                     <Option>
@@ -383,6 +415,7 @@ export default function TextEditor({ uuid }) {
                 onClick={handleSubmit}>
                 글 쓰기
             </SubmitButton>
+            
         </div>
     );
 
