@@ -223,6 +223,7 @@ export default function Setup({ session }) {
         throw error;
       }
       updateInterests();
+
     } catch (error) {
       alert(error.message);
     } finally {
@@ -236,14 +237,22 @@ export default function Setup({ session }) {
       setLoading(true);
       const user = supabase.auth.user();
       // 준영아 좀 해줘
-      const { error } = await supabase
-        .from("interest")
-        .upsert(tags, { returning: "minimal" })
-        .eq("id", user.id)
 
-      if (error) {
-        throw error;
-      }
+      await Promise.all(
+          tags.map( async t => {
+              let insert = {
+                  user: id,
+                  interest: t
+              }
+              const {error} = await supabase
+                  .from("interest")
+                  .insert(insert)
+              if (error) {
+                throw error;
+            }
+          }
+        )
+      )
     } catch (error) {
       alert(error.message);
     } finally {
