@@ -173,7 +173,33 @@ export default function TextEditor({ session }) {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [revealRange, setRevealRange] = useState(100);
     const [categoryState, setCategoryState] = useState(1);
-    const [thumnail, setThumnail] = useState(null);
+    const [thumbnail, setThumbnail] = useState(null);
+
+    useEffect(() => getCategory());
+
+    async function getCategory(){
+        try {
+            const uuid = session.user.id;
+            let { data, error } = await supabase
+                .from('category')
+                .select('*')
+                .eq('id', uuid)
+                .single();
+
+            console.log(data);
+
+
+            if (error && status !== 406) {
+                throw error;
+            }
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+        }
+    }
+
 
     async function uploadImage(event) {
         try {
@@ -201,7 +227,7 @@ export default function TextEditor({ session }) {
                 .getPublicUrl(filePath)
 
                 
-            if (thumnail == null) setThumnail(publicURL);
+            if (thumbnail == null) setThumbnail(publicURL);
             const contentState = editorState.getCurrentContent();
             const contentStateWithEntity = contentState.createEntity("image", "IMMUTABLE", { src: publicURL });
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
@@ -211,7 +237,7 @@ export default function TextEditor({ session }) {
             setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, " "));
 
         } catch (error) {
-            alert(error.message);
+            console.log(error.message);
         } finally {
             setUploadingImage(false);
         }
@@ -304,7 +330,7 @@ export default function TextEditor({ session }) {
             title: titleState,
             subtitle: subTitleState,
             content: JSON.stringify(content),
-            thumbnail: thumnail,
+            thumbnail: thumbnail,
             boundary: revealRange,
             sentiment: 0
         }
