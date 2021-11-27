@@ -1,27 +1,98 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Editor, EditorState, ContentState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw, convertFromRaw, createWithContent } from "draft-js";
+import { EditorState, ContentState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw, convertFromRaw, createWithContent } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { mediaBlockRenderer } from "./PostEditorImage";
-import { Input, Slider, Select, Button } from "antd";
+import {Input, Slider, Select, Button, Avatar} from "antd";
 import { supabase } from "../utils/supabaseClient";
 import { MdFormatAlignLeft, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
 import { BiFontSize } from 'react-icons/bi'
+import dynamic from "next/dynamic";
 
+import {
+    MdKeyboardBackspace,
+    MdIosShare,
+    MdPersonAddAlt,
+    MdThumbUpOffAlt,
+    MdOutlineComment,
+} from "react-icons/md"
+import {UserOutlined} from "@ant-design/icons";
 
-const Header = styled.div`
+const Editor = dynamic(
+    () => import('draft-js').then(mod => mod.Editor),
+    { ssr: false }
+)
 
-
+const PostingDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
 `;
+
+const TopBar = styled.div`
+  width: 100%;
+  display : flex;
+  flex-direction : row;
+  justify-content: space-between;
+  background-color: #f5f5f5;
+`;
+
+const BackspaceDiv = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px;
+`
+
+const BlankDiv = styled.div`
+  width: 24px;
+  margin: 20px;
+`;
+
+const BlogTitle = styled.div`
+  text-align: center;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 40px;
+  align-items: center;
+`;
+
 const PostTitle = styled.div`
     font-size : 24px;
     font-weight : bolder;
+    line-height: 24px;
 `;
 const PostSubTitle = styled.div`
     font-size : 16px;
-    color : gray;
-    fonr-weight : bold;
+    color : #1b1b1f;
+    font-weight : normal;
+    line-height: 18px;
+    margin-top: 20px;
 `;
+
+const SubSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+`;
+
+const UserSection = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const UserP = styled.p`
+  font-size: 11px;
+  font-weight: 700;
+  padding-left: 10px;
+  margin: 0;
+`;
+
+const MarginDiv = styled.div`
+  width: 5px`;
+
 const WhiteBlock = styled.div`
     background-color : white;
     border-radius: 15px;
@@ -34,40 +105,119 @@ const WhiteBlock = styled.div`
 
 //uid, pid로 Query해서 convertFromRaw안에 넣어주면 됨
 
-export default function PostViewer({params}){
-    console.log(params)
-    const dummy = {
-        category: 0,
-        title: "테스트 제목",
-        subtitle: "테스트 부제목",
-        content: JSON.parse("{\"blocks\":[{\"key\":\"37odd\",\"text\":\"테스트 내용\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"11gik\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"cr3bo\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"dimlc\",\"text\":\" \",\"type\":\"atomic\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[{\"offset\":0,\"length\":1,\"key\":0}],\"data\":{}},{\"key\":\"4ona6\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"6ll51\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"bi9m8\",\"text\":\"테스트 사진\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"e738s\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"df83\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{\"0\":{\"type\":\"image\",\"mutability\":\"IMMUTABLE\",\"data\":{\"src\":\"https://oqjtvbvvtbjpfgavumwy.supabase.co/storage/v1/object/public/images/0.5632126020022747.png\"}}}}"),
-        thumnail: "https://oqjtvbvvtbjpfgavumwy.supabase.co/storage/v1/object/public/images/0.5632126020022747.png",
-        boundary: 100,
-        sentiment: 0
+export default function PostViewer(props){
+    const [loading, setLoading] = useState(true);
+    const [titleState, setTitleState] = useState("");
+    const [subTitleState, setSubTitleState] = useState("");
+    const [loadedData, setLoadedData] = useState('');
+    const [editorState, setEditorState] = useState(EditorState.createEmpty());
+    const [username, setUsername] = useState(null);
+    const [title, setTitle] = useState(null);
+    const [avatar_url, setAvatarUrl] = useState(null);
+
+    useEffect(() => {
+        getPosting(props.data.pid);
+        getUserInfo(props.data.uid);
+    })
+
+    async function getPosting(pid) {
+        try {
+            setLoading(true);
+            const pid2 = window.location.pathname.split("/")[3];
+            let { data, error } = await supabase
+                .from('posting')
+                .select('*')
+                .eq('id', pid2)
+                .single();
+            setTitleState(data.title);
+            setSubTitleState(data.subtitle);
+            setEditorState(EditorState.createWithContent(convertFromRaw(data.content)))
+            if (error && status !== 406) {
+                throw error;
+            }
+        }
+        catch (error) {
+            alert(error.message);
+        }
+        finally {
+            setLoading(false);
+        }
     }
-    const state = convertFromRaw(dummy.content);
-    console.log(state)
-    const [editorState, setEditorState] = useState(EditorState.createWithContent(state));
+
+    async function getUserInfo (uid) {
+        try {
+            setLoading(true)
+            const uid = window.location.pathname.split("/")[2];
+            let { data, error } = await supabase
+                .from('user')
+                .select('username, title, avatar_url')
+                .eq('id', uid)
+                .single();
+            if (error && status !== 406) {
+                throw error;
+            }
+            if (data) {
+                setUsername(data.username);
+                setTitle(data.title);
+                setAvatarUrl(data.avatar_url);
+            }
+        }
+        catch (error) {
+            alert(error.message);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
 
     const getBlockStyle = (block) => {
         return block.getType();
     }
     return(
-        <div>
-            <Header>
+        <PostingDiv>
+            <TopBar>
+                <BackspaceDiv>
+                    <MdKeyboardBackspace
+                        size="24"
+                        height="40"/>
+                </BackspaceDiv>
+                <BackspaceDiv>
+                    <BlogTitle>
+                        {title}
+                    </BlogTitle>
+                </BackspaceDiv>
+                <BlankDiv>{" "}</BlankDiv>
+            </TopBar>
 
-            </Header>
             <WhiteBlock>
                 <PostTitle>
-                    {dummy.title}
+                    {titleState}
                 </PostTitle>
                 <PostSubTitle>
-                    {dummy.subtitle}
+                    {subTitleState}
                 </PostSubTitle>
-                <div>
-                    김뜼똘
-                </div>
+                <SubSection>
+                    <UserSection>
+                        <div>
+                            {avatar_url === null ? (
+                                <Avatar size={30} icon={<UserOutlined />} />
+                            ) : (
+                                <Avatar size={30} src={avatar_url} />
+                            )}
+                        </div>
+                        <UserP>{username}</UserP>
+                    </UserSection>
+                    <div>
+                        <MdIosShare
+                            size="24"/>
+                        <MdPersonAddAlt
+                            size="24"/>
+                    </div>
+                </SubSection>
+
             </WhiteBlock>
+
             <WhiteBlock>
                 <Editor
                     editorState={editorState}
@@ -78,7 +228,7 @@ export default function PostViewer({params}){
             </WhiteBlock>
 
 
-        </div>
+        </PostingDiv>
     )
 
 
