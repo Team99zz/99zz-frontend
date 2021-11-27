@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Editor, EditorState, DraftEditorCommand, RichUtils, AtomicBlockUtils, convertToRaw } from "draft-js";
+import { EditorState, RichUtils, AtomicBlockUtils, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { mediaBlockRenderer } from "./PostEditorImage";
 import { Input, Slider, Select, Button } from "antd";
 import { supabase } from "../utils/supabaseClient";
 import { MdFormatAlignLeft, MdOutlineImage, MdFormatListBulleted, MdFormatListNumbered, MdFormatBold, MdFormatItalic, MdFormatStrikethrough } from "react-icons/md";
 import { BiFontSize } from 'react-icons/bi'
+import dynamic from "next/dynamic";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
+
+const Editor = dynamic(
+    () => import('draft-js').then(mod => mod.Editor),
+    { ssr: false }
+)
 
 const CategorySelect = styled(Select)`
     width :100%;
@@ -158,13 +164,13 @@ const marks = {
     100: "전체",
 };
 
-export default function TextEditor({ uuid }) {
+export default function TextEditor({ session }) {
     const [titleState, setTitleState] = useState("");
     const [subTitleState, setSubTitleState] = useState("");
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [uploadingImage, setUploadingImage] = useState(false);
     const [revealRange, setRevealRange] = useState(100);
-    const [categoryState, setCategoryState] = useState(0);
+    const [categoryState, setCategoryState] = useState(1);
     const [thumnail, setThumnail] = useState(null);
 
     async function uploadImage(event) {
@@ -191,6 +197,8 @@ export default function TextEditor({ uuid }) {
                 .storage
                 .from("images")
                 .getPublicUrl(filePath)
+
+                
             if (thumnail == null) setThumnail(publicURL);
             const contentState = editorState.getCurrentContent();
             const contentStateWithEntity = contentState.createEntity("image", "IMMUTABLE", { src: publicURL });
@@ -289,7 +297,7 @@ export default function TextEditor({ uuid }) {
         }
 
         const query = {
-            user: uuid,
+            user: session.user.id,
             category: categoryState,
             title: titleState,
             subtitle: subTitleState,
