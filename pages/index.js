@@ -5,17 +5,7 @@ import { supabase } from "../utils/supabaseClient";
 import Auth from "../components/Auth";
 import Setup from "../components/Setup";
 
-export default function Home() {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    setSession(supabase.auth.session());
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
+export default function Home(props) {
   return (
     <div>
       <Head>
@@ -23,11 +13,11 @@ export default function Home() {
       </Head>
 
       <div>
-        {!session ? (
+        {!props.session ? (
           <Auth />
         ) : (
             // Needs to be changed to main screen
-          <Setup key={session.user.id} session={session} />
+          <Setup key={props.session.user.id} session={props.session} />
         )}
       </div>
     </div>
