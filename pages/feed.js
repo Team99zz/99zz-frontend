@@ -130,8 +130,6 @@ export default function Feed({ session }) {
         })
       );
 
-      console.log(posting);
-
       if (error && status !== 406) {
         throw error;
       }

@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import styled from "styled-components";
-import { supabase } from "../utils/supabaseClient";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 import {
   MdAccountCircle,
@@ -32,71 +31,58 @@ const BtnTab = styled.div`
 
 const Nav = (props) => {
   const router = useRouter();
-  const currentPath = router.pathname;
+  const [activeTab, setActiveTab] = useState(props.activeTab);
 
-  const [active, setActive] = useState("none");
-
-  useEffect(() => {
-
-    redirect(currentPath)
-  }, []);
-
-  async function redirect(path) {
-    if (path === "/feed") {
-      router.push("/feed");
-      setActive("/feed");
-    } else if (path === "/newpost") {
-      router.push("/newpost");
-      setActive("/newpost");
-    } else if (path === "/user") {
-      router.push(`/user/${props.userId}`);
-      setActive("/user");
-    }
+  async function handleClick(tab) {
+    console.log("tab: ", tab);
+    await setActiveTab(tab);
+    console.log("activeTab:", activeTab);
+    await router.push(`/${tab}`);
   }
 
   return (
     <div>
-      {active !== "none" ? (
+      {activeTab !== "none" ? (
         <BottomNav>
           <BtnTab>
-            {active === "/feed" ? (
+            {activeTab === "feed" ? (
               <MdOutlineDescription
                 size="30"
                 color="#244FDF"
-                onClick={() => redirect("/feed")}
+                onClick={() => handleClick("feed")}
               />
             ) : (
               <MdOutlineDescription
                 size="30"
-                onClick={() => redirect("/feed")}
+                onClick={() => handleClick("feed")}
               />
             )}
           </BtnTab>
           <BtnTab>
-            {active === "/newpost" ? (
+            {activeTab === "newpost" ? (
               <MdOutlineDriveFileRenameOutline
                 size="30"
                 color="#244FDF"
-                onClick={() => redirect("/newpost")}
+                onClick={() => handleClick("newpost")}
               />
             ) : (
               <MdOutlineDriveFileRenameOutline
                 size="30"
-                onClick={() => redirect("/newpost")}
+                onClick={() => handleClick("newpost")}
               />
             )}
           </BtnTab>
           <BtnTab>
-            {active === "/user" ? (
+            {activeTab === `user/${props.userId}` ? (
               <MdAccountCircle
                 size="30"
                 color="#244FDF"
-                onClick={() => redirect("/user")}
+                onClick={() => handleClick(`user/${props.userId}`)}
               />
             ) : (
               <MdAccountCircle
                 size="30"
-                onClick={() => router.push(`/user`)}
+                onClick={() => handleClick(`user/${props.userId}`)}
               />
             )}
           </BtnTab>
