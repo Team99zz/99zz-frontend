@@ -111,8 +111,13 @@ export default function PostViewer(props){
     const [subTitleState, setSubTitleState] = useState("");
     const [loadedData, setLoadedData] = useState('');
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
+    const [username, setUsername] = useState(null);
+    const [title, setTitle] = useState(null);
+    const [avatar_url, setAvatarUrl] = useState(null);
+
     useEffect(() => {
         getPosting(props.data.pid);
+        getUserInfo(props.data.uid);
     })
 
     async function getPosting(pid) {
@@ -139,6 +144,32 @@ export default function PostViewer(props){
         }
     }
 
+    async function getUserInfo (uid) {
+        try {
+            setLoading(true)
+            const uid = window.location.pathname.split("/")[2];
+            let { data, error } = await supabase
+                .from('user')
+                .select('username, title, avatar_url')
+                .eq('id', uid)
+                .single();
+            if (error && status !== 406) {
+                throw error;
+            }
+            if (data) {
+                setUsername(data.username);
+                setTitle(data.title);
+                setAvatarUrl(data.avatar_url);
+            }
+        }
+        catch (error) {
+            alert(error.message);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
 
     const getBlockStyle = (block) => {
         return block.getType();
@@ -153,7 +184,7 @@ export default function PostViewer(props){
                 </BackspaceDiv>
                 <BackspaceDiv>
                     <BlogTitle>
-                        블로그 이름 넣아야 함
+                        {title}
                     </BlogTitle>
                 </BackspaceDiv>
                 <BlankDiv>{" "}</BlankDiv>
@@ -169,13 +200,13 @@ export default function PostViewer(props){
                 <SubSection>
                     <UserSection>
                         <div>
-                            {props.avatarUrl === null ? (
+                            {avatar_url === null ? (
                                 <Avatar size={30} icon={<UserOutlined />} />
                             ) : (
-                                <Avatar size={30} src={props.avatarUrl} />
+                                <Avatar size={30} src={avatar_url} />
                             )}
                         </div>
-                        <UserP>이름 넣어야 함</UserP>
+                        <UserP>{username}</UserP>
                     </UserSection>
                     <div>
                         <MdIosShare
