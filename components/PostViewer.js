@@ -9,7 +9,10 @@ import { MdFormatAlignLeft, MdFormatListBulleted, MdFormatListNumbered, MdFormat
 import { BiFontSize } from 'react-icons/bi'
 
 
+const Header = styled.div`
 
+
+`;
 const PostTitle = styled.div`
     font-size : 24px;
     font-weight : bolder;
@@ -26,7 +29,8 @@ const WhiteBlock = styled.div`
     margin-bottom : 20px;
 `;
 
-export default function PostViewer({userid, postid}){
+export default function PostViewer({params}){
+    console.log(params)
     const dummy = {
         category: 0,
         title: "테스트 제목",
@@ -45,6 +49,9 @@ export default function PostViewer({userid, postid}){
     }
     return(
         <div>
+            <Header>
+
+            </Header>
             <WhiteBlock>
                 <PostTitle>
                     {dummy.title}
