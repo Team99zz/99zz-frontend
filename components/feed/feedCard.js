@@ -7,22 +7,59 @@ const CardDiv = styled.div`
   margin-bottom: 10px;
   border-radius: 12px;
   height: 151px;
+  justify-content: space-between;
+  padding-left: 16px;
 `;
 
-const CardTitle = styled.p``;
-const CardSubtitle = styled.p``;
+const ImageDiv = styled.div`
+  height: 151px;
+  width: 151px;
+  position: relative;
+`;
 
-const CardImg = styled.img``;
+const CardInnerDiv = styled.div`
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const CardTitle = styled.p`
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;  
+`;
+const CardSubtitle = styled.p`
+    font-size: 10px;
+`;
+
+const CustomImage = styled(Image)`
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+`;
 
 export default function FeedCard(props) {
   return (
     <CardDiv>
-      <CardTitle>{props.title}</CardTitle>
-      <CardSubtitle>{props.subtitle}</CardSubtitle>
+      <CardInnerDiv>
+        <div>
+          <CardTitle>{props.title}</CardTitle>
+          <CardSubtitle>{props.subtitle}</CardSubtitle>
+        </div>
+        <div>최똘똘</div>
+      </CardInnerDiv>
+
       {props.thumbnail === null ? (
         <></>
       ) : (
-        <Image src={props.thumbnail} alt={props.title} height="151px" width="151px"/>
+        <ImageDiv>
+          <CustomImage
+            src={props.thumbnail}
+            alt={props.title}
+            layout="fill"
+            objectFit="cover"
+          />
+        </ImageDiv>
       )}
     </CardDiv>
   );

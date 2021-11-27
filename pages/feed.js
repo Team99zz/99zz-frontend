@@ -54,6 +54,7 @@ const PublicCard = styled.div`
   border-radius: 18px;
   padding: 10px 20px;
   text-align: center;
+  margin-bottom: 10px;
 `;
 
 const PCardP = styled.p`
