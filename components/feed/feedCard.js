@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Image from "next/image";
-
+import Link from 'next/link'
 import { Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 
@@ -57,34 +57,38 @@ const UserSection = styled.div`
 
 export default function FeedCard(props) {
   return (
-    <CardDiv>
-      <CardInnerDiv>
-        <div>
-          <CardTitle>{props.title}</CardTitle>
-          <CardSubtitle>{props.subtitle}</CardSubtitle>
-        </div>
-        <UserSection>
-          {props.avatarUrl === null ? (
-            <Avatar size={30} icon={<UserOutlined />} />
-          ) : (
-            <Avatar size={30} src={props.avatarUrl} />
-          )}
-          <UserP>{props.blogTitle}</UserP>
-        </UserSection>
-      </CardInnerDiv>
+    <Link href={props.href}>
+      <CardDiv>
+        <CardInnerDiv>
+          <div>
+            <CardTitle>{props.title}</CardTitle>
+            <CardSubtitle>{props.subtitle}</CardSubtitle>
+          </div>
+          <UserSection>
+            {props.avatarUrl === null ? (
+              <Avatar size={30} icon={<UserOutlined />} />
+            ) : (
+              <Avatar size={30} src={props.avatarUrl} />
+            )}
+            <UserP>{props.blogTitle}</UserP>
+          </UserSection>
+        </CardInnerDiv>
 
-      {props.thumbnail === null ? (
-        <></>
-      ) : (
-        <ImageDiv>
-          <CustomImage
-            src={props.thumbnail}
-            alt={props.title}
-            layout="fill"
-            objectFit="cover"
-          />
-        </ImageDiv>
-      )}
-    </CardDiv>
+        {props.thumbnail === null ? (
+          <></>
+        ) : (
+          <ImageDiv>
+            <CustomImage
+              src={props.thumbnail}
+              alt={props.title}
+              layout="fill"
+              objectFit="cover"
+            />
+          </ImageDiv>
+        )}
+      </CardDiv>
+
+    </Link>
+   
   );
 }

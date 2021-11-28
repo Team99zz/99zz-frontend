@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { BackTop, Slider } from "antd";
 import "moment/locale/ko";
+import Link from 'next/link'
 
 import {
   MdNotificationsNone,
@@ -212,14 +213,15 @@ export default function Feed({ session }) {
           <></>
         )}
         {feed.map((posting, index) => (
-          <FeedCard
-            key={index}
-            title={posting.title}
-            subtitle={posting.subtitle}
-            thumbnail={posting.thumbnail}
-            avatarUrl={posting.avatar_url}
-            blogTitle={posting.blog_title}
-          ></FeedCard>
+
+            <FeedCard
+              key={index} href={`/user/${posting.user}/${posting.id}`}
+              title={posting.title}
+              subtitle={posting.subtitle}
+              thumbnail={posting.thumbnail}
+              avatarUrl={posting.avatar_url}
+              blogTitle={posting.blog_title}
+            ></FeedCard>
         ))}
       </FeedInnerDiv>
     </FeedDiv>

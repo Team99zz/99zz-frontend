@@ -172,22 +172,23 @@ export default function TextEditor({ session }) {
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [uploadingImage, setUploadingImage] = useState(false);
     const [revealRange, setRevealRange] = useState(100);
-    const [categoryState, setCategoryState] = useState(1);
+    const [categoryList, setcategoryList] = useState([]);
+    const [categoryState, setCategoryState] = useState("");
     const [thumbnail, setThumbnail] = useState(null);
+    const [gettingCategory, setGettingCategory] = useState(false);
 
-    useEffect(() => getCategory());
+    useEffect(() => getCategory(), []);
 
     async function getCategory(){
         try {
+            setGettingCategory(true);
             const uuid = session.user.id;
             let { data, error } = await supabase
                 .from('category')
                 .select('*')
-                .eq('id', uuid)
-                .single();
-
+                .eq('user', uuid);
             console.log(data);
-
+            setcategoryList(data);
 
             if (error && status !== 406) {
                 throw error;
@@ -197,6 +198,7 @@ export default function TextEditor({ session }) {
             console.log(error.message);
         }
         finally {
+            setGettingCategory(false);
         }
     }
 
@@ -342,12 +344,11 @@ export default function TextEditor({ session }) {
 
         if(error) throw error;
         else{
-            const url = `/${data[0].user}/${data[0].id}`;
+            const url = `/user/${data[0].user}/${data[0].id}`;
             router.push(url)
         }
 
     }
-
 
     return (
         <div>
@@ -435,13 +436,16 @@ export default function TextEditor({ session }) {
             </PostSetting>
             <PostSetting>
                 <h2>카테고리</h2>
-                <CategorySelect>
-                    <Option>
-                        Hello World
-                    </Option>
+                <CategorySelect  onChange={value=>setCategoryState(value)}>
+                    {
+
+                        categoryList.map((category, index) => (
+                            <Option key={index} value={category.id} onClick={(value) => setCategoryState(value)}>{category.title}</Option>
+                        ))
+
+                    }
                 </CategorySelect>
             </PostSetting>
-
             <SubmitButton
                 onClick={handleSubmit}>
                 글 쓰기

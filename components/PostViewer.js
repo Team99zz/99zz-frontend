@@ -17,6 +17,9 @@ import {
     MdOutlineComment,
 } from "react-icons/md"
 import {UserOutlined} from "@ant-design/icons";
+import Router from 'next/router'
+
+
 
 const Editor = dynamic(
     () => import('draft-js').then(mod => mod.Editor),
@@ -106,6 +109,7 @@ const WhiteBlock = styled.div`
 //uid, pid로 Query해서 convertFromRaw안에 넣어주면 됨
 
 export default function PostViewer(props){
+    
     const [loading, setLoading] = useState(true);
     const [titleState, setTitleState] = useState("");
     const [subTitleState, setSubTitleState] = useState("");
@@ -118,6 +122,7 @@ export default function PostViewer(props){
     useEffect(() => {
         getPosting(props.data.pid);
         getUserInfo(props.data.uid);
+        return () => setLoading(false);
     })
 
     async function getPosting(pid) {
@@ -170,7 +175,7 @@ export default function PostViewer(props){
         }
     }
 
-
+    // const router = useRouter();
     const getBlockStyle = (block) => {
         return block.getType();
     }
@@ -179,6 +184,7 @@ export default function PostViewer(props){
             <TopBar>
                 <BackspaceDiv>
                     <MdKeyboardBackspace
+                        onClick={Router.back}
                         size="24"
                         height="40"/>
                 </BackspaceDiv>
