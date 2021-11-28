@@ -73,6 +73,7 @@ const User = ({ session }) => {
       let { data: posting, error } = await supabase
         .from("posting")
         .select("id, user, title, subtitle, created_at, thumbnail")
+        .eq("user", session.user.id)
         .order("created_at", { ascending: false });
 
       posting = await Promise.all(
@@ -162,6 +163,8 @@ const User = ({ session }) => {
           blogTitle={posting.blog_title}
         ></FeedCard>
       ))}
+      <br/>
+      <br/>
     </AccountDiv>
   );
 };
