@@ -173,7 +173,7 @@ export default function TextEditor({ session }) {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [revealRange, setRevealRange] = useState(100);
     const [categoryList, setcategoryList] = useState([]);
-    const [categoryState, setCategoryState] = useState("");
+    const [categoryState, setCategoryState] = useState(0);
     const [thumbnail, setThumbnail] = useState(null);
     const [gettingCategory, setGettingCategory] = useState(false);
 

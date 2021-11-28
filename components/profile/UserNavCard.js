@@ -12,7 +12,7 @@ const UserNavCardDiv = styled.div`
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
-  padding: 20px 30px;
+  padding: 20px 30px; 
   text-align: center;
 `;
 
