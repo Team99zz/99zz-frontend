@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { BackTop, Slider } from "antd";
 import "moment/locale/ko";
-import Link from 'next/link'
+import Link from "next/link";
 
 import {
   MdNotificationsNone,
@@ -110,7 +110,7 @@ export default function Feed({ session }) {
       let { data: posting, error } = await supabase
         .from("posting")
         .select("id, user, title, subtitle, created_at, thumbnail")
-          .order("created_at", {ascending:false})
+        .order("created_at", { ascending: false });
 
       posting = await Promise.all(
         posting.map(async (p) => {
@@ -213,15 +213,16 @@ export default function Feed({ session }) {
           <></>
         )}
         {feed.map((posting, index) => (
-
-            <FeedCard
-              key={index} href={`/user/${posting.user}/${posting.id}`}
-              title={posting.title}
-              subtitle={posting.subtitle}
-              thumbnail={posting.thumbnail}
-              avatarUrl={posting.avatar_url}
-              blogTitle={posting.blog_title}
-            ></FeedCard>
+          <FeedCard
+            key={index}
+            href={`/user/${posting.user}/${posting.id}`}
+            title={posting.title}
+            subtitle={posting.subtitle}
+            thumbnail={posting.thumbnail}
+            avatarUrl={posting.avatar_url}
+            blogTitle={posting.blog_title}
+            timeAgo={posting.time_ago}
+          ></FeedCard>
         ))}
       </FeedInnerDiv>
     </FeedDiv>

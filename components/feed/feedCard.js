@@ -55,6 +55,13 @@ const UserSection = styled.div`
   align-items: center;
 `;
 
+const TimeP = styled.p`
+  font-size: 9px;
+  font-weight: 400;
+  padding-left: 10px;
+  margin-bottom: -2px;
+`
+
 export default function FeedCard(props) {
   return (
     <Link href={props.href}>
@@ -71,6 +78,7 @@ export default function FeedCard(props) {
               <Avatar size={30} src={props.avatarUrl} />
             )}
             <UserP>{props.blogTitle}</UserP>
+            <TimeP>{props.timeAgo}</TimeP>
           </UserSection>
         </CardInnerDiv>
 

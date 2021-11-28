@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import styled from "styled-components";
 import FeedCard from "../../components/feed/feedCard";
+import "moment/locale/ko";
+import moment from "moment";
 
 import UserProfileCard from "../../components/profile/UserProfileCard";
 import UserNavCard from "../../components/profile/UserNavCard";
@@ -31,12 +33,12 @@ const CustomSelect = styled(Select)`
     color: #fff;
   }
   &.css-1hb7zxy-IndicatorsContainer > div > svg > path {
-      color: #fff;
-  }
-  &.css-6j8wv5-Input{
     color: #fff;
-    ::placeholder{
-        color: #fff;
+  }
+  &.css-6j8wv5-Input {
+    color: #fff;
+    ::placeholder {
+      color: #fff;
     }
   }
 `;
@@ -62,7 +64,7 @@ const User = ({ session }) => {
   }, [session]);
 
   async function getFeed() {
-    console.log("gf")
+    console.log("gf");
 
     try {
       setLoading(true);
@@ -71,7 +73,7 @@ const User = ({ session }) => {
       let { data: posting, error } = await supabase
         .from("posting")
         .select("id, user, title, subtitle, created_at, thumbnail")
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
       posting = await Promise.all(
         posting.map(async (p) => {
@@ -97,7 +99,7 @@ const User = ({ session }) => {
       }
       if (posting) {
         setFeed(posting);
-        console.log(posting)
+        console.log(posting);
       }
     } catch (error) {
       alert(error.message);
@@ -105,9 +107,9 @@ const User = ({ session }) => {
       setLoading(false);
     }
   }
-  
+
   async function getProfile() {
-    console.log("gp")
+    console.log("gp");
 
     try {
       setLoading(true);
@@ -138,7 +140,6 @@ const User = ({ session }) => {
     }
   }
 
-  const router = useRouter();
   return (
     <AccountDiv>
       <UserProfileCard
@@ -151,9 +152,9 @@ const User = ({ session }) => {
         <CustomSelect options={options} />
       </MyFeedDiv>
       {feed.map((posting, index) => (
-
         <FeedCard
-          key={index} href={`/user/${posting.user}/${posting.id}`}
+          key={index}
+          href={`/user/${posting.user}/${posting.id}`}
           title={posting.title}
           subtitle={posting.subtitle}
           thumbnail={posting.thumbnail}
@@ -161,7 +162,6 @@ const User = ({ session }) => {
           blogTitle={posting.blog_title}
         ></FeedCard>
       ))}
-
     </AccountDiv>
   );
 };
