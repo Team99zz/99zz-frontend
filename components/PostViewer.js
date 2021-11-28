@@ -38,7 +38,58 @@ import Router from "next/router";
 const Editor = dynamic(() => import("draft-js").then((mod) => mod.Editor), {
   ssr: false,
 });
+const EditorComponent = styled.div`
+    
+    .texteditor {
+        width: 40rem;
+        
+    }
 
+    .DraftEditor-root {
+        background-color : white;
+        margin: 0.5rem 0;
+        
+    }
+
+    .DraftEditor-editorContainer {
+        padding: 1.5rem;
+        line-height : 200%;
+    }
+
+    .public-DraftEditor-content {
+        min-height: 20rem;
+        
+        
+    }
+    .h3{
+        font-size : 20px;
+        font-weight : bolder;
+    }
+    .h2{
+        font-size : 18px;
+        font-weight : bold;
+    }
+    .h1{
+        font-size : 16px;
+        font-weight : bold;
+    }
+    .h0{
+        font-size : 14px;
+        font-weight : normal;
+    }
+
+    .a0 div{
+        text-align: left;
+    }
+    .a1 div{
+        text-align: center;
+    }
+    .a2 div{
+        text-align: right;
+    }
+
+
+`;
 const PostingDiv = styled.div`
   display: flex;
   flex-direction: column;
@@ -148,10 +199,11 @@ export default function PostViewer(props) {
         .select("*")
         .eq("id", pid2)
         .single();
+      console.log(data);
       setTitleState(data.title);
       setSubTitleState(data.subtitle);
       setEditorState(
-        EditorState.createWithContent(convertFromRaw(data.content))
+        EditorState.createWithContent(convertFromRaw(JSON.parse(data.content)))
       );
       if (error && status !== 406) {
         throw error;
@@ -225,12 +277,15 @@ export default function PostViewer(props) {
       </WhiteBlock>
 
       <WhiteBlock>
+        <EditorComponent>
+        
         <Editor
           editorState={editorState}
           readOnly={true}
           blockRendererFn={mediaBlockRenderer}
           blockStyleFn={getBlockStyle}
         />
+      </EditorComponent>
       </WhiteBlock>
     </PostingDiv>
   );
